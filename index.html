@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#070b0f" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="description" content="Listen to timeless old Hindi songs with natural monsoon rain, chai and a cinematic Indian veranda. A free immersive radio for rainy evenings." />
+    <meta name="application-name" content="Chai Baarish Gaane" />
+    <meta name="apple-mobile-web-app-title" content="Chai Baarish Gaane" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:site_name" content="Chai Baarish Gaane" />
+    <meta property="og:title" content="Chai Baarish Gaane — Old Hindi Songs &amp; Monsoon Radio" />
+    <meta property="og:description" content="Purane gaane, natural monsoon rain and warm chai on a cinematic Indian veranda." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Chai Baarish Gaane — Old Hindi Songs &amp; Monsoon Radio" />
+    <meta name="twitter:description" content="Purane gaane, natural monsoon rain and warm chai on a cinematic Indian veranda." />
+    <title>Chai Baarish Gaane — Old Hindi Songs &amp; Monsoon Radio</title>
+    <link rel="icon" href="assets/images/cbg-mark.svg" type="image/svg+xml" />
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="preload" href="assets/images/veranda-monsoon.jpg" as="image" type="image/jpeg" fetchpriority="high" />
+    <link rel="preconnect" href="https://www.youtube.com" />
+    <link rel="dns-prefetch" href="https://i.ytimg.com" />
+    <link rel="stylesheet" href="style.css?v=entry-20260817-v4" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Chai Baarish Gaane",
+        "alternateName": "CBG",
+        "description": "An immersive old Hindi music radio with natural Indian monsoon rain, thunder and a warm veranda atmosphere.",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript, HTML5 audio and an internet connection for YouTube playback",
+        "inLanguage": ["en-IN", "hi-Latn"],
+        "isAccessibleForFree": true,
+        "featureList": [
+          "Old Hindi song playlist",
+          "Natural layered monsoon ambience",
+          "Interactive rain and storm controls",
+          "Shuffle and mood filters"
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <main class="experience" id="experience" aria-label="A rainy Indian veranda at night">
+      <div class="scene" aria-hidden="true">
+        <div class="scene-image"></div>
+        <div class="cloud-glow"></div>
+        <div class="lightning-wash" id="lightningWash"></div>
+        <canvas id="rainCanvas"></canvas>
+        <div class="window-rain"></div>
+        <div class="film-grain"></div>
+        <div class="vignette"></div>
+      </div>
+
+      <header class="brand scene-ui" aria-label="Chai Baarish Gaane">
+        <div class="brand-mark"><img src="assets/images/cbg-mark.svg" alt="" /></div>
+        <div>
+          <h1>CHAI BAARISH GAANE</h1>
+          <p>chai <span>•</span> baarish <span>•</span> purane gaane</p>
+        </div>
+      </header>
+
+      <button class="chai-hotspot scene-ui" id="chaiHotspot" aria-label="Pick up the chai">
+        <span class="steam steam-one"></span>
+        <span class="steam steam-two"></span>
+        <span class="chai-ring"></span>
+      </button>
+
+      <p class="weather-note scene-ui" id="weatherNote">MUMBAI · 7:14 PM</p>
+      <div class="headlights scene-ui" id="headlights" aria-hidden="true"></div>
+
+      <section class="radio-console scene-ui" id="radioConsole" aria-label="Music and rain controls">
+        <div class="radio-topline">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span>PURANE GAANE</span>
+          <button class="icon-button small" id="playlistButton" aria-label="Open playlist" title="Playlist">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h11M4 11h11M4 16h7M19 5v10.5a2.5 2.5 0 1 1-2-2.45V5h2Z"/></svg>
+          </button>
+        </div>
+
+        <div class="track-copy" aria-live="polite">
+          <p class="track-kicker" id="trackMood">baarish pick · 1979</p>
+          <h2 id="trackTitle">Rimjhim Gire Saawan</h2>
+          <p id="trackArtist">Kishore Kumar · Manzil</p>
+        </div>
+
+        <button class="tap-to-play" id="tapToPlay" hidden>▶ Tap to play</button>
+
+        <div class="progress-wrap">
+          <span id="elapsed">0:00</span>
+          <button class="progress" id="progress" aria-label="Song progress">
+            <span id="progressFill"></span>
+          </button>
+          <span id="duration">—:—</span>
+        </div>
+
+        <div class="transport">
+          <button class="icon-button" id="shuffleButton" aria-label="Monsoon shuffle" aria-pressed="false" title="Monsoon shuffle">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5M4 17h2.3c4.7 0 6-10 10.7-10h4M16 21h5v-5M4 7h2.3c1.9 0 3.2 1.6 4.3 3.5M13.5 15.5c1 1.2 2 1.5 3.5 1.5h4"/></svg>
+          </button>
+          <button class="icon-button" id="previousButton" aria-label="Previous song">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M18 6l-9 6 9 6V6Z"/></svg>
+          </button>
+          <button class="play-button" id="playButton" aria-label="Play">
+            <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7V5Z"/></svg>
+            <svg class="pause-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM14 5h4v14h-4z"/></svg>
+          </button>
+          <button class="icon-button" id="nextButton" aria-label="Next song">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M6 6l9 6-9 6V6Z"/></svg>
+          </button>
+          <button class="icon-button" id="ambienceButton" aria-label="Turn ambience off" title="Ambience on">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14v-4M8 17V7M12 20V4M16 17V7M20 14v-4"/></svg>
+          </button>
+        </div>
+
+        <div class="mixer">
+          <label>
+            <span><span aria-hidden="true">🌧</span> RAIN</span>
+            <input id="rainVolume" type="range" min="0" max="100" value="22" aria-label="Rain volume" />
+          </label>
+          <label>
+            <span><span aria-hidden="true">♫</span> MUSIC</span>
+            <input id="musicVolume" type="range" min="0" max="100" value="46" aria-label="Music volume" />
+          </label>
+        </div>
+
+        <div class="rain-modes" role="group" aria-label="Rain intensity">
+          <button data-rain="light">light</button>
+          <button data-rain="medium">medium</button>
+          <button data-rain="heavy" class="active">heavy</button>
+          <button data-rain="storm">storm</button>
+        </div>
+
+        <div class="utility-row">
+          <button id="shareButton">share this baarish ☕</button>
+          <div>
+            <button class="icon-button small" id="lightningButton" aria-label="Call lightning" title="Call lightning">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"/></svg>
+            </button>
+            <button class="icon-button small" id="fullscreenButton" aria-label="Enter fullscreen" title="Fullscreen">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="playlist-drawer" id="playlistDrawer" aria-label="Purane gaane playlist" aria-hidden="true" inert>
+        <div class="drawer-head">
+          <div>
+            <p>36 GAANE · ONE LONG BAARISH</p>
+            <h2>Shaam ki cassette</h2>
+          </div>
+          <button class="icon-button" id="closePlaylist" aria-label="Close playlist">×</button>
+        </div>
+        <div class="mood-filters" id="moodFilters" role="group" aria-label="Filter songs by mood">
+          <button class="active" data-mood="all">all</button>
+          <button data-mood="rain">rain</button>
+          <button data-mood="romantic">romantic</button>
+          <button data-mood="nostalgic">nostalgic</button>
+          <button data-mood="sad">sad</button>
+          <button data-mood="safar">safar</button>
+        </div>
+        <ol class="playlist" id="playlist"></ol>
+        <p class="drawer-foot">YouTube embeds · if a song is unavailable, the cassette moves on.</p>
+      </aside>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+      <section class="entry entry-v2" id="entry" aria-labelledby="entryTitle">
+        <div class="entry-world" aria-hidden="true">
+          <div class="entry-backdrop entry-depth" data-depth="1"></div>
+          <div class="entry-night-grade"></div>
+          <div class="entry-horizon entry-depth" data-depth="2"></div>
+          <div class="entry-practical entry-depth" data-depth="3"></div>
+          <div class="entry-veranda-warmth entry-depth" data-depth="4"></div>
+          <div class="entry-wet-floor entry-depth" data-depth="5"></div>
+          <div class="entry-puddle"><i></i><i></i><i></i></div>
+          <canvas class="entry-rain-canvas" id="entryRainCanvas"></canvas>
+          <div class="entry-glass-drops"></div>
+          <div class="entry-headlights"><i></i><i></i></div>
+          <div class="entry-cursor-light"></div>
+          <div class="entry-lightning-reflection"></div>
+          <div class="entry-lightning" id="entryLightning"></div>
+        </div>
+
+        <header class="entry-weather">
+          <span>MONSOON / INDIA</span>
+          <time id="entryTime">11:47 PM</time>
+        </header>
+
+        <div class="entry-copy entry-editorial">
+          <p class="eyebrow"><span>01</span> A RAINY LISTENING ROOM</p>
+          <div class="entry-title-lockup">
+            <span class="title-chai">CHAI</span>
+            <h2 id="entryTitle">
+              <span class="title-baarish">BAARISH</span>
+              <span class="title-gaane">GAANE</span>
+            </h2>
+          </div>
+          <p class="entry-whisper">Purane gaane. Garam chai.<br />Baahar poori raat baarish.</p>
+          <button id="enterButton">
+            <span class="enter-copy"><strong>ENTER</strong><small>andar aao</small></span>
+            <span class="enter-line" aria-hidden="true"></span>
+            <span class="enter-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></span>
+          </button>
+          <p class="sound-note"><span></span> sound enters softly</p>
+        </div>
+
+        <button class="entry-chair" id="entryChair" aria-label="Take the chair" aria-describedby="entryChairNote">
+          <span aria-hidden="true"></span>
+        </button>
+        <p class="entry-chair-note" id="entryChairNote" aria-live="polite">Baitho.</p>
+
+        <button class="entry-chai" id="entryChai" aria-label="Touch the warm chai" aria-describedby="entryChaiNote">
+          <span class="entry-steam steam-a"></span>
+          <span class="entry-steam steam-b"></span>
+          <span class="entry-chai-glow"></span>
+        </button>
+        <p class="entry-chai-note" id="entryChaiNote" aria-live="polite"></p>
+      </section>
+
+      <div id="youtubePlayer" aria-hidden="true"></div>
+    </main>
+
+    <noscript>
+      <section aria-label="About Chai Baarish Gaane">
+        <h1>Chai Baarish Gaane — old Hindi songs and monsoon ambience</h1>
+        <p>This free rainy-evening radio pairs timeless Hindi film songs with natural rain, thunder and a warm Indian veranda. JavaScript is required for the interactive music player.</p>
+      </section>
+    </noscript>
+    <script src="playlist.js?v=20260817-4"></script>
+    <script src="script.js?v=entry-20260817-v4"></script>
+  </body>
+</html>

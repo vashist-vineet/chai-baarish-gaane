@@ -1,0 +1,40 @@
+/*
+ * CHAI BAARISH GAANE playlist
+ * Add new songs here using the same shape. Use official, embeddable YouTube uploads.
+ */
+window.CBG_PLAYLIST = [
+  { title: "Rimjhim Gire Saawan", artist: "Kishore Kumar", film: "Manzil", year: "1979", youtubeId: "JQoSSJDZxOo", mood: "rain" },
+  { title: "Ek Ladki Bheegi Bhagi Si", artist: "Kishore Kumar", film: "Chalti Ka Naam Gaadi", year: "1958", youtubeId: "CFjkBtoi4H8", mood: "rain" },
+  { title: "O Sajna Barkha Bahar Aayi", artist: "Lata Mangeshkar", film: "Parakh", year: "1960", youtubeId: "wI50w-uttTA", mood: "rain" },
+  { title: "Lag Ja Gale", artist: "Lata Mangeshkar", film: "Woh Kaun Thi?", year: "1964", youtubeId: "br6C4U3Dyfo", mood: "romantic" },
+  { title: "Pal Pal Dil Ke Paas", artist: "Kishore Kumar", film: "Blackmail", year: "1973", youtubeId: "AMuRRXCuy-4", mood: "romantic" },
+  { title: "Kahin Door Jab Din Dhal Jaye", artist: "Mukesh", film: "Anand", year: "1971", youtubeId: "3KPptLqYIkY", mood: "sad" },
+  { title: "Aane Wala Pal", artist: "Kishore Kumar", film: "Gol Maal", year: "1979", youtubeId: "W65lyLhUpNw", mood: "nostalgic" },
+  { title: "Tere Bina Zindagi Se", artist: "Lata Mangeshkar, Kishore Kumar", film: "Aandhi", year: "1975", youtubeId: "Zm4V6ty4K6k", mood: "sad" },
+  { title: "Humein Tumse Pyar Kitna", artist: "Kishore Kumar", film: "Kudrat", year: "1981", youtubeId: "iTkTrVXwCsA", mood: "romantic" },
+  { title: "Chura Liya Hai Tumne", artist: "Asha Bhosle, Mohammed Rafi", film: "Yaadon Ki Baaraat", year: "1973", youtubeId: "DASoD0d5HBc", mood: "romantic" },
+  { title: "Neele Neele Ambar Par", artist: "Kishore Kumar", film: "Kalaakaar", year: "1983", youtubeId: "ThHYiiZTB1Y", mood: "romantic" },
+  { title: "Gulabi Aankhen", artist: "Mohammed Rafi", film: "The Train", year: "1970", youtubeId: "KWAdrB2U7cE", mood: "romantic" },
+  { title: "Bahon Ke Darmiyan", artist: "Alka Yagnik, Hariharan", film: "Khamoshi", year: "1996", youtubeId: "kHYYfKAQdHA", mood: "romantic" },
+  { title: "Aankhon Mein Humne Aapke", artist: "Kishore Kumar, Lata Mangeshkar", film: "Thodisi Bewafaii", year: "1980", youtubeId: "GkGAUidq01g", mood: "nostalgic" },
+  { title: "Dil Dhoondta Hai", artist: "Bhupinder Singh, Lata Mangeshkar", film: "Mausam", year: "1975", youtubeId: "2RL0XVbs3Us", mood: "nostalgic" },
+  { title: "Yeh Shaam Mastani", artist: "Kishore Kumar", film: "Kati Patang", year: "1971", youtubeId: "5ZaKMzJrzXQ", mood: "nostalgic" },
+  { title: "Kora Kagaz Tha Yeh Man Mera", artist: "Kishore Kumar, Lata Mangeshkar", film: "Aradhana", year: "1969", youtubeId: "kqXs4GGp8bw", mood: "romantic" },
+  { title: "Pyar Deewana Hota Hai", artist: "Kishore Kumar", film: "Kati Patang", year: "1971", youtubeId: "yiHfWoN33c8", mood: "romantic" },
+  { title: "Hothon Se Chhu Lo Tum", artist: "Jagjit Singh", film: "Prem Geet", year: "1981", youtubeId: "X0gB9jcgXxg", mood: "sad" },
+  { title: "Jhuki Jhuki Si Nazar", artist: "Jagjit Singh", film: "Arth", year: "1982", youtubeId: "Eat7bbGgSa0", mood: "sad" },
+  { title: "Tum Ko Dekha To Yeh Khayal Aaya", artist: "Jagjit Singh, Chitra Singh", film: "Saath Saath", year: "1982", youtubeId: "WtPbNKk9XpU", mood: "nostalgic" },
+  { title: "Woh Kagaz Ki Kashti", artist: "Jagjit Singh", film: "Aaj", year: "1985", youtubeId: "h2_pWl0QgbY", mood: "nostalgic" },
+  { title: "Ek Ajnabee Haseena Se", artist: "Kishore Kumar", film: "Ajanabee", year: "1974", youtubeId: "eRDojLoCDpQ", mood: "nostalgic" },
+  { title: "Musafir Hoon Yaaron", artist: "Kishore Kumar", film: "Parichay", year: "1972", youtubeId: "Yd62azPw4hI", mood: "safar" },
+  { title: "Chala Jata Hoon", artist: "Kishore Kumar", film: "Mere Jeevan Saathi", year: "1972", youtubeId: "UNjhqT_hlbg", mood: "safar" },
+  { title: "Zindagi Ek Safar Hai Suhana", artist: "Kishore Kumar", film: "Andaz", year: "1971", youtubeId: "GjPGVVebVUc", mood: "safar" },
+  { title: "Suhana Safar Aur Yeh Mausam", artist: "Mukesh", film: "Madhumati", year: "1958", youtubeId: "E5N7k1V2bQk", mood: "safar" },
+  { title: "Aaj Jaane Ki Zid Na Karo", artist: "Farida Khanum", film: "Live classic", year: "1985", youtubeId: "KDJL2FyRDeA", mood: "sad" },
+  { title: "Kisi Nazar Ko Tera Intezar", artist: "Bhupinder Singh, Asha Bhosle", film: "Aitbaar", year: "1985", youtubeId: "j8qtywZ6L70", mood: "sad" },
+  { title: "Jab Deep Jale Aana", artist: "K. J. Yesudas, Hemlata", film: "Chitchor", year: "1976", youtubeId: "ah1T5cTZmo8", mood: "nostalgic" },
+  { title: "Tum Itna Jo Muskura Rahe Ho", artist: "Jagjit Singh", film: "Arth", year: "1982", youtubeId: "3c109Ojf0G8", mood: "sad" },
+  { title: "Yeh Haseen Wadiyan", artist: "S. P. Balasubrahmanyam, K. S. Chithra", film: "Roja", year: "1992", youtubeId: "5kZ5o-oM0RI", mood: "safar" },
+  { title: "Tu Hi Re", artist: "Hariharan, Kavita Krishnamurthy", film: "Bombay", year: "1995", youtubeId: "V9mN0qBgEzQ", mood: "rain" },
+  { title: "Pehla Nasha", artist: "Udit Narayan, Sadhana Sargam", film: "Jo Jeeta Wohi Sikandar", year: "1992", youtubeId: "SBfPs-PMGTA", mood: "romantic" }
+];

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Chai Baarish Gaane</title>
+  <defs>
+    <linearGradient id="bg" x1="8" y1="5" x2="56" y2="59" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#12232a"/>
+      <stop offset="1" stop-color="#050b0e"/>
+    </linearGradient>
+    <linearGradient id="cup" x1="17" y1="29" x2="46" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff6e7"/>
+      <stop offset="1" stop-color="#efb568"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="17" fill="url(#bg)" stroke="#ffffff" stroke-opacity=".14"/>
+  <path d="M19 12.5v8.5M28 9v10M37 13v7" fill="none" stroke="#6fd6d8" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M15.5 29.5h29v6.2c0 9.1-5.5 15.1-14.5 15.1s-14.5-6-14.5-15.1v-6.2Z" fill="url(#cup)" fill-opacity=".13" stroke="url(#cup)" stroke-width="2.4"/>
+  <path d="M44.5 33h2.1a6.4 6.4 0 0 1 0 12.8h-5" fill="none" stroke="#efb568" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M18.5 55h27" fill="none" stroke="#f8e8cf" stroke-opacity=".62" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="19" cy="25" r="1.6" fill="#efb568"/>
+</svg>

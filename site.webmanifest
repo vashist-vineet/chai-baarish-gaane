@@ -1,0 +1,19 @@
+{
+  "name": "Chai Baarish Gaane",
+  "short_name": "CBG",
+  "description": "Old Hindi songs, natural monsoon rain and warm chai on a cinematic Indian veranda.",
+  "lang": "en-IN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070b0f",
+  "theme_color": "#070b0f",
+  "icons": [
+    {
+      "src": "assets/images/cbg-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
