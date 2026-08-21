@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: chai-pe-chat
+    runtime: node
+    region: singapore
+    plan: free
+    branch: dev
+    numInstances: 1
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.22.0
+      - key: CHAT_ALLOWED_ORIGINS
+        value: https://baarishfm.vercel.app

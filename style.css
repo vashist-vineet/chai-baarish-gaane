@@ -75,13 +75,66 @@ input:focus-visible {
 }
 
 .scene-image {
-  background-image: url("assets/images/veranda-monsoon.jpg");
-  background-size: cover;
-  background-position: center center;
+  --scene-art: url("assets/images/veranda-monsoon.jpg");
+  --scene-fit: cover;
+  --scene-position: 50% 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background: #05090d;
   filter: saturate(0.77) brightness(0.67) contrast(1.08);
-  transform: scale(1.025);
+  transform: scale(1.012);
   transition: filter 1.8s ease, transform 2.8s cubic-bezier(0.2, 0.75, 0.2, 1), opacity 1.8s ease;
   opacity: 0.72;
+}
+
+.scene-image::before,
+.scene-image::after,
+.winter-scene-image::before,
+.winter-scene-image::after,
+.spring-scene-image::before,
+.spring-scene-image::after,
+.autumn-scene-image::before,
+.autumn-scene-image::after,
+.desert-scene-image::before,
+.desert-scene-image::after,
+.coast-scene-image::before,
+.coast-scene-image::after,
+.entry-backdrop::before,
+.entry-backdrop::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  background-image: var(--scene-art);
+  background-position: var(--scene-position, 50% 50%);
+  background-repeat: no-repeat;
+}
+
+/* A soft same-art backdrop fills non-16:9 edges while the sharp layer preserves
+   the source composition instead of letting `cover` crop it aggressively. */
+.scene-image::before,
+.winter-scene-image::before,
+.spring-scene-image::before,
+.autumn-scene-image::before,
+.desert-scene-image::before,
+.coast-scene-image::before,
+.entry-backdrop::before {
+  z-index: 0;
+  inset: -3%;
+  background-size: cover;
+  filter: blur(22px) brightness(.68) saturate(.76);
+  transform: scale(1.025);
+}
+
+.scene-image::after,
+.winter-scene-image::after,
+.spring-scene-image::after,
+.autumn-scene-image::after,
+.desert-scene-image::after,
+.coast-scene-image::after,
+.entry-backdrop::after {
+  z-index: 1;
+  inset: 0;
+  background-size: var(--scene-fit, contain);
 }
 
 .entered .scene-image {
@@ -959,10 +1012,15 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
 }
 
 .entry-backdrop {
-  inset: -2.5%;
-  background: url("assets/images/veranda-monsoon.jpg") center center / cover no-repeat;
+  --scene-art: url("assets/images/veranda-monsoon.jpg");
+  --scene-fit: cover;
+  --scene-position: 50% 48%;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: #03070a;
   filter: saturate(.72) brightness(.72) contrast(1.08);
-  --entry-scale: 1.035;
+  --entry-scale: 1.012;
   transition-duration: 2.2s;
 }
 
@@ -1459,7 +1517,7 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
 }
 
 @media (max-width: 760px) {
-  .entry-backdrop { background-position: 29% center; filter: saturate(.72) brightness(.68) contrast(1.08); }
+  .entry-backdrop { filter: saturate(.72) brightness(.68) contrast(1.08); }
   .entry-cold-grade {
     background:
       linear-gradient(180deg, rgba(0,8,13,.16), rgba(0,8,13,.34) 52%, rgba(1,4,6,.64)),
@@ -1496,7 +1554,6 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
   .entry-chai { left: 25%; bottom: 15.5%; width: 64px; }
   .entry-chai-note { left: 25%; bottom: 10.7%; white-space: nowrap; }
   .entry-floor-shine { top: 64%; }
-  .scene-image { background-position: 29% center; }
   .brand { left: 18px; top: max(18px, env(safe-area-inset-top)); }
   .brand-mark { width: 36px; height: 36px; border-radius: 11px; }
   .weather-note { display: none; }
@@ -1599,9 +1656,9 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
 }
 
 .entry-v2 .entry-backdrop {
-  inset: -3%;
-  --entry-scale: 1.035;
-  background-position: center 48%;
+  inset: 0;
+  --entry-scale: 1.012;
+  --scene-position: 50% 48%;
   filter: saturate(.71) brightness(.67) contrast(1.11);
   animation: v2-camera-drift 18s ease-in-out 3s infinite alternate;
 }
@@ -2066,7 +2123,7 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
 .entry-v2 .entry-steam { opacity: .22; }
 
 .entering .entry-v2 .entry-backdrop {
-  --entry-scale: 1.09;
+  --entry-scale: 1.025;
   filter: saturate(.82) brightness(.78) contrast(1.06);
   animation-play-state: paused;
   transition-duration: .8s;
@@ -2092,8 +2149,8 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
 }
 
 @keyframes v2-camera-drift {
-  from { transform: translate3d(var(--layer-x, 0), var(--layer-y, 0), 0) scale(1.035); }
-  to { transform: translate3d(calc(var(--layer-x, 0) - .35%), calc(var(--layer-y, 0) - .2%), 0) scale(1.05); }
+  from { transform: translate3d(var(--layer-x, 0), var(--layer-y, 0), 0) scale(1.012); }
+  to { transform: translate3d(calc(var(--layer-x, 0) - .2%), calc(var(--layer-y, 0) - .12%), 0) scale(1.02); }
 }
 
 @keyframes v2-lamp-breathe { from { opacity: .67; } to { opacity: .86; } }
@@ -2225,4 +2282,1498 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
   .entry-v2 .entry-rain-far { opacity: .065; }
   .entry-v2 .entry-rain-near { opacity: .04; }
   .entry-v2 .entry-world { filter: none; transform: none; }
+}
+
+/* Second listening world: Kashmir-inspired Himalayan winter. */
+.winter-world,
+.winter-scene-image,
+.winter-sky-glow,
+.winter-mountain-mist,
+.winter-house-lights,
+.winter-window-frost,
+.environment-mist,
+#snowCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.winter-world {
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(1.018);
+  transition: opacity 3s ease, transform 3.6s cubic-bezier(.2,.75,.2,1);
+}
+
+.winter-scene-image {
+  --scene-art: url("assets/images/winter/veranda-himalayan-winter.jpg");
+  --scene-fit: cover;
+  --scene-position: 50% 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background: #081016;
+  filter: saturate(.76) brightness(.74) contrast(1.07);
+  transform: scale(1.012);
+  transition: filter 3s ease, transform 4s cubic-bezier(.2,.75,.2,1);
+}
+
+.winter-sky-glow {
+  background:
+    radial-gradient(ellipse at 72% 7%, rgba(190,221,236,.22), transparent 40%),
+    linear-gradient(180deg, rgba(91,130,153,.16), transparent 52%);
+  mix-blend-mode: screen;
+  opacity: .72;
+  animation: winter-sky-breathe 15s ease-in-out infinite alternate;
+}
+
+.winter-mountain-mist {
+  inset: 15% -8% 24% 28%;
+  background:
+    radial-gradient(ellipse at 48% 44%, rgba(220,233,238,.24), transparent 54%),
+    linear-gradient(90deg, transparent, rgba(185,211,222,.13), transparent);
+  filter: blur(18px);
+  opacity: .5;
+  animation: winter-mist-drift 22s ease-in-out infinite alternate;
+}
+
+.winter-house-lights {
+  inset: 18% 2% 42% 55%;
+  background:
+    radial-gradient(circle at 78% 43%, rgba(255,190,96,.9) 0 1px, transparent 3px),
+    radial-gradient(circle at 66% 52%, rgba(255,179,82,.8) 0 1px, transparent 3px),
+    radial-gradient(circle at 88% 59%, rgba(255,203,124,.72) 0 1px, transparent 3px);
+  filter: blur(.35px) drop-shadow(0 0 7px rgba(255,173,71,.42));
+  opacity: .5;
+  animation: winter-lights 9s ease-in-out infinite alternate;
+}
+
+.winter-window-frost {
+  z-index: 4;
+  background:
+    radial-gradient(ellipse at -6% 18%, rgba(229,241,245,.2), transparent 30%),
+    radial-gradient(ellipse at 103% 8%, rgba(223,238,243,.13), transparent 27%),
+    linear-gradient(90deg, rgba(218,235,241,.1), transparent 9%, transparent 92%, rgba(218,235,241,.08));
+  mix-blend-mode: screen;
+  opacity: .7;
+}
+
+#snowCanvas {
+  z-index: 3;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 2.4s ease;
+}
+
+.environment-mist {
+  z-index: 7;
+  background:
+    radial-gradient(ellipse at 58% 46%, rgba(190,211,220,.48), transparent 58%),
+    linear-gradient(90deg, transparent 8%, rgba(195,215,223,.2) 52%, transparent 94%);
+  filter: blur(20px);
+  opacity: 0;
+}
+
+body.entered[data-environment="winter"] {
+  --mint: #bce8f1;
+  --border: rgba(219,239,244,.16);
+}
+
+body[data-environment="winter"] .winter-world { opacity: 1; transform: scale(1); }
+body[data-environment="winter"] .winter-scene-image {
+  filter: saturate(.86) brightness(.88) contrast(1.04);
+  transform: scale(1);
+}
+body[data-environment="winter"] .scene-image { opacity: 0; transform: scale(1.025); }
+body[data-environment="winter"] #rainCanvas { opacity: 0; }
+body[data-environment="winter"] .window-rain,
+body[data-environment="winter"] .cloud-glow,
+body[data-environment="winter"] .headlights { opacity: 0; }
+body[data-environment="winter"][data-rain-mode="light"] #snowCanvas { opacity: .44; }
+body[data-environment="winter"][data-rain-mode="medium"] #snowCanvas { opacity: .62; }
+body[data-environment="winter"][data-rain-mode="heavy"] #snowCanvas { opacity: .78; }
+body[data-environment="winter"][data-rain-mode="storm"] #snowCanvas { opacity: .92; }
+body[data-environment="winter"].snow-gust #snowCanvas { opacity: 1; }
+body[data-environment="winter"].winter-mist-event .winter-mountain-mist {
+  animation: none;
+  opacity: .88;
+  transform: translate3d(7%, -1%, 0) scale(1.14);
+  transition: opacity 2.2s ease, transform 5.8s ease;
+}
+body[data-environment="winter"].winter-warm-event .winter-house-lights {
+  animation: none;
+  opacity: .9;
+  filter: blur(.25px) drop-shadow(0 0 12px rgba(255,173,71,.64));
+  transition: opacity 1.4s ease, filter 1.4s ease;
+}
+
+/* Third listening world: the same Himalayan veranda after winter ends. */
+.spring-world,
+.spring-scene-image,
+.spring-sky-opening,
+.spring-valley-mist,
+.spring-sunlight,
+.spring-flowers-distant,
+.spring-flowers-mid,
+.spring-flowers,
+#butterfliesContainer,
+#petalCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.spring-world {
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(1.018);
+  transition: opacity 3.7s ease .35s, transform 4.3s cubic-bezier(.2,.75,.2,1);
+}
+
+.spring-scene-image {
+  --scene-art: url("assets/images/spring/veranda-himalayan-spring.jpg");
+  --scene-fit: cover;
+  --scene-position: 50% 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background: #101a18;
+  filter: saturate(.74) brightness(.72) contrast(1.07) hue-rotate(-3deg);
+  transform: scale(1.012);
+  transition: filter 4.2s ease, transform 4.4s cubic-bezier(.2,.75,.2,1);
+}
+
+.spring-sky-opening {
+  background:
+    radial-gradient(ellipse at 41% 1%, rgba(255,225,175,.28), transparent 42%),
+    linear-gradient(180deg, rgba(207,222,218,.14), transparent 48%);
+  mix-blend-mode: screen;
+  opacity: .42;
+  animation: spring-sky-breathe 18s ease-in-out infinite alternate;
+}
+
+/* CSS rainbow overlay removed — the source image already contains a natural
+   rainbow baked into the top-right sky. The .spring-rainbow element is kept
+   in the DOM for backward-compat but kept permanently invisible. */
+.spring-rainbow {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.spring-valley-mist {
+  inset: 18% -12% 24% 26%;
+  background:
+    radial-gradient(ellipse at 44% 50%, rgba(226,235,220,.22), transparent 56%),
+    linear-gradient(90deg, transparent 8%, rgba(215,229,217,.12), transparent 92%);
+  filter: blur(20px);
+  opacity: .44;
+  animation: spring-mist-drift 24s ease-in-out infinite alternate;
+  transition: opacity 2.2s ease, transform 5.5s ease;
+}
+
+.spring-sunlight {
+  background:
+    linear-gradient(112deg, rgba(255,210,139,.14), transparent 38%),
+    radial-gradient(ellipse at 21% 7%, rgba(255,220,161,.18), transparent 45%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 3.1s ease 1.15s;
+}
+
+/* Distant slope flowers — very subtle color specks that read as far-off blooms */
+.spring-flowers-distant {
+  inset: 22% 0 38% 0;
+  transform-origin: 50% 50%;
+  background:
+    radial-gradient(ellipse at 78% 38%, rgba(246,222,190,.13), transparent 14%),
+    radial-gradient(ellipse at 62% 55%, rgba(230,207,226,.11), transparent 12%),
+    radial-gradient(ellipse at 84% 62%, rgba(240,225,195,.10), transparent 10%),
+    radial-gradient(ellipse at 71% 28%, rgba(220,235,210,.09), transparent 16%),
+    radial-gradient(ellipse at 55% 44%, rgba(235,210,222,.08), transparent 11%),
+    /* new upper-right / far mountain house flowers */
+    radial-gradient(ellipse at 82% 26%, rgba(244,178,192,.15), transparent 8%),
+    radial-gradient(ellipse at 88% 32%, rgba(248,218,130,.15), transparent 9%),
+    radial-gradient(ellipse at 85% 20%, rgba(212,188,230,.14), transparent 7%),
+    radial-gradient(ellipse at 92% 38%, rgba(220,130,120,.12), transparent 8%),
+    radial-gradient(ellipse at 76% 22%, rgba(242,240,225,.14), transparent 6%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: spring-flowers-sway 11s ease-in-out infinite alternate;
+  transition: opacity 3.2s ease 1.2s, filter 1.4s ease;
+}
+
+/* Mid-distance slope flowers — small patches with slight warm tones */
+.spring-flowers-mid {
+  inset: 36% -1% 22% 10%;
+  transform-origin: 50% 80%;
+  background:
+    radial-gradient(ellipse at 18% 34%, rgba(240,180,170,.15), transparent 8%),
+    radial-gradient(ellipse at 34% 52%, rgba(246,218,140,.13), transparent 7%),
+    radial-gradient(ellipse at 52% 28%, rgba(208,188,226,.14), transparent 9%),
+    radial-gradient(ellipse at 67% 44%, rgba(240,235,210,.12), transparent 6%),
+    radial-gradient(ellipse at 81% 38%, rgba(244,185,175,.13), transparent 7%),
+    radial-gradient(ellipse at 26% 68%, rgba(220,236,208,.11), transparent 8%),
+    radial-gradient(ellipse at 58% 74%, rgba(246,210,148,.12), transparent 6%),
+    radial-gradient(ellipse at 74% 62%, rgba(218,190,228,.11), transparent 7%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: spring-flowers-sway 9s ease-in-out infinite alternate;
+  transition: opacity 3s ease 1.35s, filter 1.4s ease;
+}
+
+/* Foreground flowers — more defined patches near the lower meadow areas */
+.spring-flowers {
+  inset: 52% -3% -5% 20%;
+  transform-origin: 50% 100%;
+  background:
+    /* pink wildflower clusters */
+    radial-gradient(ellipse at 14% 62%, rgba(236,168,178,.22), transparent 6%),
+    radial-gradient(ellipse at 22% 78%, rgba(244,178,192,.20), transparent 5%),
+    radial-gradient(ellipse at 8% 84%, rgba(240,175,185,.18), transparent 4%),
+    /* yellow/golden patches */
+    radial-gradient(ellipse at 38% 56%, rgba(248,218,130,.20), transparent 6%),
+    radial-gradient(ellipse at 44% 82%, rgba(246,212,138,.18), transparent 5%),
+    /* white/cream blooms */
+    radial-gradient(ellipse at 58% 64%, rgba(242,240,225,.19), transparent 5%),
+    radial-gradient(ellipse at 52% 88%, rgba(238,236,220,.17), transparent 4%),
+    /* lavender/purple tones */
+    radial-gradient(ellipse at 70% 58%, rgba(212,188,230,.20), transparent 6%),
+    radial-gradient(ellipse at 78% 76%, rgba(218,192,232,.17), transparent 5%),
+    /* scattered soft red/rose */
+    radial-gradient(ellipse at 86% 68%, rgba(232,155,155,.16), transparent 5%),
+    radial-gradient(ellipse at 92% 84%, rgba(236,162,162,.14), transparent 4%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: spring-flowers-sway 7.5s ease-in-out infinite alternate;
+  transition: opacity 2.8s ease 1.45s, filter 1.4s ease;
+}
+
+#petalCanvas {
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 1.1s ease;
+}
+
+#butterfliesContainer {
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 2.4s ease 2.2s;
+}
+
+.butterfly-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  /* Prevent pointer interaction so it doesn't block UI */
+  pointer-events: none;
+}
+
+.butterfly-svg {
+  width: var(--b-size, 20px);
+  height: var(--b-size, 20px);
+  /* The SVG is drawn facing "up". We rotate it based on flight direction in JS, but 
+     add a slight base rotation to give it a natural pitch. */
+  transform: rotate(var(--b-angle, 0deg));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.butterfly-wing {
+  transform-style: preserve-3d;
+  transform-origin: center;
+  /* Flapping animation is controlled by JS applying scaleX or rotateY directly 
+     to avoid CSS animation conflicts with exact physics phases. */
+}
+
+body.entered[data-environment="spring"] {
+  --mint: #b7e4ae;
+  --border: rgba(222,238,211,.17);
+}
+
+body[data-environment="spring"] .spring-world { opacity: 1; transform: scale(1); }
+body[data-environment="spring"] .spring-scene-image {
+  filter: saturate(.96) brightness(.94) contrast(1.025) hue-rotate(0deg);
+  transform: scale(1);
+}
+/* .spring-rainbow intentionally omitted — image already has natural rainbow */
+body[data-environment="spring"] .spring-sunlight { opacity: .72; }
+body[data-environment="spring"] .spring-flowers-distant { opacity: .52; }
+body[data-environment="spring"] .spring-flowers-mid { opacity: .60; }
+body[data-environment="spring"] .spring-flowers { opacity: .64; }
+body[data-environment="spring"] #butterfliesContainer { opacity: 1; }
+body[data-environment="spring"] .scene-image,
+body[data-environment="spring"] .winter-world { opacity: 0; transform: scale(1.025); }
+body[data-environment="spring"] #rainCanvas,
+body[data-environment="spring"] #snowCanvas,
+body[data-environment="spring"] .window-rain,
+body[data-environment="spring"] .cloud-glow,
+body[data-environment="spring"] .headlights { opacity: 0; }
+body[data-environment="spring"][data-rain-mode="light"] #petalCanvas { opacity: .32; }
+body[data-environment="spring"][data-rain-mode="medium"] #petalCanvas { opacity: .48; }
+body[data-environment="spring"][data-rain-mode="heavy"] #petalCanvas { opacity: .64; }
+body[data-environment="spring"][data-rain-mode="storm"] #petalCanvas { opacity: .78; }
+body[data-environment="spring"][data-rain-mode="medium"] .spring-flowers { animation-duration: 6.6s; }
+body[data-environment="spring"][data-rain-mode="medium"] .spring-flowers-mid { animation-duration: 8s; }
+body[data-environment="spring"][data-rain-mode="medium"] .spring-flowers-distant { animation-duration: 10s; }
+body[data-environment="spring"][data-rain-mode="heavy"] .spring-flowers { animation-duration: 4.8s; }
+body[data-environment="spring"][data-rain-mode="heavy"] .spring-flowers-mid { animation-duration: 5.8s; }
+body[data-environment="spring"][data-rain-mode="heavy"] .spring-flowers-distant { animation-duration: 7s; }
+body[data-environment="spring"][data-rain-mode="storm"] .spring-flowers { animation-duration: 3.2s; }
+body[data-environment="spring"][data-rain-mode="storm"] .spring-flowers-mid { animation-duration: 4s; }
+body[data-environment="spring"][data-rain-mode="storm"] .spring-flowers-distant { animation-duration: 5s; }
+body[data-environment="spring"].spring-breeze-event #petalCanvas { opacity: .88; }
+body[data-environment="spring"].spring-breeze-event .spring-flowers { animation-duration: 2.5s; filter: brightness(1.07); }
+body[data-environment="spring"].spring-breeze-event .spring-flowers-mid { animation-duration: 3.5s; }
+body[data-environment="spring"].spring-breeze-event .spring-flowers-distant { animation-duration: 5s; }
+body[data-environment="spring"].spring-mist-event .spring-valley-mist {
+  animation: none;
+  opacity: .78;
+  transform: translate3d(7%, -1%, 0) scale(1.1);
+}
+body[data-environment="spring"].spring-sun-event .spring-sunlight { opacity: .94; transition-delay: 0s; }
+body.environment-from-winter.environment-to-spring #snowCanvas {
+  opacity: 0;
+  transition: opacity 2.1s ease;
+}
+body.environment-to-spring #petalCanvas { transition: opacity 2.6s ease 1.55s; }
+body.environment-from-winter.environment-to-spring .winter-world {
+  transition-duration: 3.5s;
+}
+body.environment-from-spring.environment-to-monsoon .spring-world,
+body.environment-from-spring.environment-to-monsoon .spring-sunlight,
+body.environment-from-spring.environment-to-monsoon .spring-flowers-distant,
+body.environment-from-spring.environment-to-monsoon .spring-flowers-mid,
+body.environment-from-spring.environment-to-monsoon .spring-flowers,
+body.environment-from-spring.environment-to-monsoon #butterfliesContainer,
+body.environment-from-spring.environment-to-monsoon #petalCanvas {
+  transition-delay: 0s;
+}
+body.environment-from-spring.environment-to-monsoon .cloud-glow { opacity: .86; transition: opacity 3.4s ease 1s; }
+body.environment-from-spring.environment-to-monsoon #rainCanvas { transition: opacity 3.1s ease 1.05s; }
+
+body.environment-transitioning .environment-mist { animation: environment-mist-pass 3s ease-in-out both; }
+body.environment-transitioning.environment-to-spring .environment-mist,
+body.environment-transitioning.environment-from-spring .environment-mist { animation-duration: 4.2s; }
+body.environment-transitioning .environment-switch { opacity: .42; }
+
+.environment-switch {
+  position: absolute;
+  top: max(24px, calc(env(safe-area-inset-top) + 20px));
+  right: clamp(24px, 3vw, 44px);
+  overflow: hidden;
+  min-width: 208px;
+  border: 1px solid rgba(226,241,239,.16);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(15,24,27,.66), rgba(5,10,13,.48));
+  box-shadow: 0 12px 34px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.035);
+  backdrop-filter: blur(15px) saturate(.82);
+  -webkit-backdrop-filter: blur(15px) saturate(.82);
+  text-shadow: 0 2px 16px #000;
+  transition: opacity .45s ease, transform .45s ease, border-color .45s ease, box-shadow .45s ease;
+}
+
+.environment-switch button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 61px;
+  padding: 10px 13px 10px 15px;
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,.78);
+  text-align: left;
+  cursor: pointer;
+  transition: color .25s ease, background .25s ease;
+}
+
+.environment-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
+}
+
+.environment-copy small {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 10px;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: .025em;
+  color: rgba(255,255,255,.5);
+  white-space: nowrap;
+  transition: color .35s ease;
+}
+
+.environment-copy strong {
+  color: rgba(255,255,255,.86);
+  font-size: 10px;
+  font-weight: 780;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color .25s ease, text-shadow .25s ease;
+}
+
+.environment-switch button b {
+  flex: 0 0 auto;
+  color: var(--mint);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform .25s ease, filter .25s ease;
+}
+.environment-switch button:hover,
+.environment-switch button:focus-visible { color: var(--paper); background: rgba(255,255,255,.035); }
+.environment-switch button:hover b,
+.environment-switch button:focus-visible b { transform: translateX(2px); }
+.environment-switch button:disabled { cursor: wait; opacity: .48; }
+.ui-idle .environment-switch { opacity: .62; }
+.playlist-open .environment-switch {
+  opacity: 0 !important;
+  pointer-events: none;
+  transform: translateY(-7px);
+}
+
+.environment-switch.attention {
+  opacity: 1 !important;
+  animation: environment-attention 1.2s ease-in-out 3;
+}
+
+.environment-switch.attention .environment-copy small {
+  animation: environment-hint-attention 1.2s ease-in-out 3;
+}
+
+.environment-switch.attention .environment-copy strong {
+  animation: environment-text-attention 1.2s ease-in-out 3;
+}
+
+.environment-switch.attention button b {
+  animation: environment-arrow-attention 1.2s ease-in-out 3;
+}
+
+.snow-gust-icon { display: none; }
+body[data-environment="winter"] .lightning-icon,
+body[data-environment="spring"] .lightning-icon,
+body[data-environment="desert"] .lightning-icon,
+body[data-environment="coast"] .lightning-icon { display: none; }
+body[data-environment="winter"] .snow-gust-icon,
+body[data-environment="spring"] .snow-gust-icon,
+body[data-environment="desert"] .snow-gust-icon,
+body[data-environment="coast"] .snow-gust-icon { display: block; }
+body[data-environment="winter"] .chai-ring { background: rgba(241,177,92,.2); }
+body[data-environment="winter"] .radio-console {
+  background:
+    linear-gradient(150deg, rgba(25,38,43,.86), rgba(7,14,19,.79)),
+    rgba(5,11,15,.64);
+  backdrop-filter: blur(22px) saturate(.74);
+  -webkit-backdrop-filter: blur(22px) saturate(.74);
+}
+body[data-environment="spring"] .radio-console {
+  background:
+    linear-gradient(150deg, rgba(23,35,30,.84), rgba(7,14,12,.78)),
+    rgba(5,12,9,.63);
+  backdrop-filter: blur(22px) saturate(.78);
+  -webkit-backdrop-filter: blur(22px) saturate(.78);
+}
+
+@keyframes environment-mist-pass {
+  0%, 100% { opacity: 0; transform: translateX(-5%) scale(1.04); }
+  42%, 58% { opacity: .78; transform: translateX(3%) scale(1.1); }
+}
+
+@keyframes winter-sky-breathe {
+  from { opacity: .48; transform: translateY(-1%); }
+  to { opacity: .78; transform: translateY(1%); }
+}
+
+@keyframes winter-mist-drift {
+  from { transform: translate3d(-4%, 1%, 0) scale(1); opacity: .35; }
+  to { transform: translate3d(5%, -2%, 0) scale(1.08); opacity: .62; }
+}
+
+@keyframes winter-lights {
+  0%, 35% { opacity: .38; }
+  55% { opacity: .62; }
+  100% { opacity: .48; }
+}
+
+@keyframes spring-sky-breathe {
+  from { opacity: .36; transform: translateY(-.6%); }
+  to { opacity: .56; transform: translateY(.8%); }
+}
+
+@keyframes spring-mist-drift {
+  from { transform: translate3d(-3%, 1%, 0) scale(1); opacity: .32; }
+  to { transform: translate3d(5%, -1.5%, 0) scale(1.07); opacity: .55; }
+}
+
+@keyframes spring-flowers-sway {
+  from { transform: skewX(-.3deg) translateX(-.2%); }
+  to { transform: skewX(.45deg) translateX(.3%); }
+}
+
+/* Butterfly wing-flap: alternates between spread and folded silhouette */
+@keyframes butterfly-wing-flap {
+  0%, 100% { transform: scaleX(1); }
+  48%, 52% { transform: scaleX(0.15); }
+}
+
+@keyframes butterfly-float {
+  0% { transform: translateY(0px); }
+  33% { transform: translateY(-4px); }
+  66% { transform: translateY(2px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes environment-attention {
+  0%, 100% {
+    border-color: rgba(226,241,239,.16);
+    box-shadow: 0 12px 34px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.035);
+    filter: brightness(1);
+    transform: translateY(0) scale(1);
+  }
+  46%, 58% {
+    border-color: rgba(143,236,218,.42);
+    box-shadow: 0 14px 40px rgba(0,0,0,.3), 0 0 22px rgba(0,255,204,.13), inset 0 1px rgba(255,255,255,.09);
+    filter: brightness(1.12);
+    transform: translateY(-1px) scale(1.018);
+  }
+}
+
+@keyframes environment-hint-attention {
+  0%, 100% { color: rgba(255,255,255,.5); }
+  50% { color: rgba(255,255,255,.72); }
+}
+
+@keyframes environment-text-attention {
+  0%, 100% { color: rgba(255,255,255,.86); text-shadow: none; }
+  50% { color: #fff; text-shadow: 0 0 13px rgba(183,244,233,.24); }
+}
+
+@keyframes environment-arrow-attention {
+  0%, 100% { transform: translateX(0); filter: brightness(1); }
+  50% { transform: translateX(4px); filter: brightness(1.28) drop-shadow(0 0 5px rgba(0,255,204,.42)); }
+}
+@media (min-width: 761px) and (min-aspect-ratio: 19 / 10) {
+  /* On ultrawide displays, 'cover' crops top/bottom. Adjust position to preserve key art. */
+  .spring-scene-image { --scene-position: 50% 18%; }
+}
+
+@media (max-width: 760px) {
+  .scene-image,
+  .entry-backdrop {
+    --scene-fit: cover;
+    --scene-position: 29% 50%;
+  }
+  .winter-scene-image,
+  .spring-scene-image {
+    --scene-fit: cover;
+    --scene-position: 31% 50%;
+  }
+  .winter-house-lights { display: none; }
+  .spring-rainbow {
+    inset: -2% -6% 52% 8%;
+    background:
+      radial-gradient(ellipse at 73% 112%, transparent 56%, rgba(224,139,151,.065) 56.5% 57.3%, rgba(239,194,134,.06) 57.5% 58.3%, rgba(214,224,148,.055) 58.5% 59.3%, rgba(142,203,180,.05) 59.5% 60.3%, rgba(142,177,218,.045) 60.5% 61.3%, transparent 61.6%);
+    opacity: 0;
+  }
+  body[data-environment="spring"] .spring-rainbow { opacity: .54; }
+  .spring-flowers { inset: 52% -18% -8% 12%; opacity: 0; }
+  body[data-environment="spring"] .spring-flowers { opacity: .46; }
+  .environment-switch {
+    top: max(76px, calc(env(safe-area-inset-top) + 68px));
+    right: max(14px, env(safe-area-inset-right));
+    bottom: auto;
+    left: auto;
+    min-width: 190px;
+  }
+  .environment-switch button { min-height: 58px; padding: 9px 12px 9px 13px; }
+  .environment-copy small { font-size: 9px; }
+  .environment-copy strong { font-size: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .winter-sky-glow,
+  .winter-mountain-mist,
+  .winter-house-lights,
+  .spring-sky-opening,
+  .spring-valley-mist,
+  .spring-flowers { animation: none; }
+  .winter-world,
+  .winter-scene-image,
+  #snowCanvas,
+  .spring-world,
+  .spring-scene-image,
+  .spring-rainbow,
+  .spring-sunlight,
+  .spring-flowers,
+  #petalCanvas { transition-duration: 1.1s; transition-delay: 0s; }
+  body.environment-transitioning .environment-mist { animation-duration: .9s; }
+  .environment-switch.attention { animation: environment-attention-reduced 1.8s ease-out 1; }
+  .environment-switch.attention .environment-copy small,
+  .environment-switch.attention .environment-copy strong,
+  .environment-switch.attention button b { animation: none; }
+}
+
+@keyframes environment-attention-reduced {
+  0%, 100% { border-color: rgba(226,241,239,.16); filter: brightness(1); }
+  45%, 65% { border-color: rgba(143,236,218,.38); filter: brightness(1.1); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FOURTH LISTENING WORLD: PATJHAD / AUTUMN
+   The same Himalayan veranda in warm October — same mountains, same houses,
+   same balcony. But the valley has turned golden, leaves have started to fall,
+   and the air has that dry chill of approaching winter.
+═══════════════════════════════════════════════════════════════════════════ */
+
+.autumn-world,
+.autumn-scene-image,
+.autumn-haze,
+.autumn-sunlight,
+.autumn-foliage-far,
+.autumn-foliage-near,
+#leafCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.autumn-world {
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(1.018);
+  transition: opacity 3.7s ease .35s, transform 4.3s cubic-bezier(.2,.75,.2,1);
+}
+
+/* Autumn uses a dedicated warm golden scene based on the same geography */
+.autumn-scene-image {
+  --scene-art: url("assets/images/autumn/veranda-himalayan-autumn.jpg");
+  --scene-fit: cover;
+  --scene-position: 50% 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background: #1a140a;
+  /* Minor adjustment for mood, base image is already graded */
+  filter: saturate(.92) brightness(.92) contrast(1.02);
+  transform: scale(1.012);
+  transition: filter 4.2s ease, transform 4.4s cubic-bezier(.2,.75,.2,1);
+}
+
+/* Atmospheric golden haze over the valley — warm low-angle sunlight feel */
+.autumn-haze {
+  background:
+    radial-gradient(ellipse at 25% 8%, rgba(255,195,110,.20), transparent 44%),
+    radial-gradient(ellipse at 72% 14%, rgba(240,170,80,.12), transparent 36%),
+    linear-gradient(180deg, rgba(218,170,90,.10), transparent 52%);
+  mix-blend-mode: screen;
+  opacity: .38;
+  animation: autumn-haze-breathe 22s ease-in-out infinite alternate;
+  transition: opacity 3.5s ease 1s;
+}
+
+/* Low warm autumn sunlight from the upper-left */
+.autumn-sunlight {
+  background:
+    linear-gradient(115deg, rgba(255,195,100,.16), transparent 42%),
+    radial-gradient(ellipse at 18% 6%, rgba(255,205,120,.22), transparent 48%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 3.2s ease 1.2s;
+}
+
+/* Distant autumn foliage — subtle colour spots on far slopes/trees, more muted */
+.autumn-foliage-far {
+  inset: 18% 0 28% 0;
+  transform-origin: 50% 50%;
+  background:
+    radial-gradient(ellipse at 75% 35%, rgba(185,130,50,.16), transparent 14%),
+    radial-gradient(ellipse at 60% 52%, rgba(165,95,42,.13), transparent 12%),
+    radial-gradient(ellipse at 82% 60%, rgba(195,145,55,.12), transparent 11%),
+    radial-gradient(ellipse at 68% 26%, rgba(145,100,48,.11), transparent 15%),
+    radial-gradient(ellipse at 85% 28%, rgba(175,120,45,.14), transparent 9%),
+    radial-gradient(ellipse at 88% 38%, rgba(155,105,52,.12), transparent 8%),
+    radial-gradient(ellipse at 77% 20%, rgba(205,160,60,.13), transparent 7%),
+    radial-gradient(ellipse at 55% 42%, rgba(175,125,50,.10), transparent 11%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: autumn-foliage-sway 14s ease-in-out infinite alternate;
+  transition: opacity 3.4s ease 1.4s, filter 1.4s ease;
+}
+
+/* Nearby autumn foliage — stronger colour on closer trees/plants */
+.autumn-foliage-near {
+  inset: 32% -2% 12% 6%;
+  transform-origin: 50% 80%;
+  background:
+    radial-gradient(ellipse at 22% 32%, rgba(190,120,45,.18), transparent 18%),
+    radial-gradient(ellipse at 35% 55%, rgba(165,95,38,.15), transparent 16%),
+    radial-gradient(ellipse at 14% 65%, rgba(200,140,55,.16), transparent 14%),
+    radial-gradient(ellipse at 48% 42%, rgba(175,115,48,.14), transparent 15%),
+    radial-gradient(ellipse at 9% 45%, rgba(155,95,40,.13), transparent 12%),
+    radial-gradient(ellipse at 62% 70%, rgba(180,125,50,.12), transparent 16%),
+    radial-gradient(ellipse at 78% 55%, rgba(165,100,42,.11), transparent 14%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: autumn-foliage-sway 9s ease-in-out infinite alternate-reverse;
+  transition: opacity 3.1s ease 1.6s, filter 1.4s ease;
+}
+
+#leafCanvas {
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 2.6s ease 1.8s;
+}
+
+/* Colour tokens shift to autumn amber when entered */
+body.entered[data-environment="autumn"] {
+  --mint: #e8c07a;
+  --border: rgba(230,195,130,.15);
+}
+
+/* ─── Autumn active states ─────────────────────────────────────────────── */
+body[data-environment="autumn"] .autumn-world { opacity: 1; transform: scale(1); }
+body[data-environment="autumn"] .autumn-scene-image {
+  /* Only minor adjustments since the asset itself is Autumn */
+  filter: saturate(1.05) brightness(1.05) contrast(1.02);
+  transform: scale(1);
+}
+body[data-environment="autumn"] .autumn-sunlight { opacity: .55; }
+body[data-environment="autumn"] .autumn-haze { opacity: .42; }
+body[data-environment="autumn"] .autumn-foliage-far { opacity: .35; }
+body[data-environment="autumn"] .autumn-foliage-near { opacity: .40; }
+body[data-environment="autumn"] #leafCanvas { opacity: 1; }
+
+/* Hide other worlds when in autumn */
+body[data-environment="autumn"] .scene-image,
+body[data-environment="autumn"] .winter-world,
+body[data-environment="autumn"] .spring-world { opacity: 0; transform: scale(1.025); }
+body[data-environment="autumn"] #rainCanvas,
+body[data-environment="autumn"] #snowCanvas,
+body[data-environment="autumn"] #petalCanvas,
+body[data-environment="autumn"] #butterfliesContainer,
+body[data-environment="autumn"] .window-rain,
+body[data-environment="autumn"] .cloud-glow,
+body[data-environment="autumn"] .headlights { opacity: 0; }
+
+/* Leaf density controlled by rain-mode (repurposed as wind-mode for autumn) */
+body[data-environment="autumn"][data-rain-mode="light"] #leafCanvas { opacity: .38; }
+body[data-environment="autumn"][data-rain-mode="medium"] #leafCanvas { opacity: .60; }
+body[data-environment="autumn"][data-rain-mode="heavy"] #leafCanvas { opacity: .80; }
+body[data-environment="autumn"][data-rain-mode="storm"] #leafCanvas { opacity: 1; }
+body[data-environment="autumn"][data-rain-mode="medium"] .autumn-foliage-near { animation-duration: 8s; }
+body[data-environment="autumn"][data-rain-mode="medium"] .autumn-foliage-far { animation-duration: 12s; }
+body[data-environment="autumn"][data-rain-mode="heavy"] .autumn-foliage-near { animation-duration: 6s; }
+body[data-environment="autumn"][data-rain-mode="heavy"] .autumn-foliage-far { animation-duration: 9s; }
+body[data-environment="autumn"][data-rain-mode="storm"] .autumn-foliage-near { animation-duration: 4s; }
+body[data-environment="autumn"][data-rain-mode="storm"] .autumn-foliage-far { animation-duration: 6s; }
+
+/* Autumn breeze event — more leaves, foliage shakes */
+body[data-environment="autumn"].autumn-breeze-event #leafCanvas { opacity: 1; }
+body[data-environment="autumn"].autumn-breeze-event .autumn-foliage-near { animation-duration: 3s; filter: brightness(1.06); }
+body[data-environment="autumn"].autumn-breeze-event .autumn-foliage-far { animation-duration: 5s; }
+
+/* Autumn haze event — valley mist rolls in briefly */
+body[data-environment="autumn"].autumn-haze-event .autumn-haze {
+  animation: none;
+  opacity: .80;
+  transform: translate3d(6%, -1%, 0) scale(1.08);
+  transition: opacity 2.4s ease, transform 6s ease;
+}
+
+/* Autumn sun event — warmer sunlight burst */
+body[data-environment="autumn"].autumn-sun-event .autumn-sunlight { opacity: .92; transition-delay: 0s; }
+
+/* ─── Spring → Autumn transition ───────────────────────────────────────── */
+/* Remove spring-specific delay so they exit quickly */
+body.environment-from-spring.environment-to-autumn .spring-world,
+body.environment-from-spring.environment-to-autumn .spring-sunlight,
+body.environment-from-spring.environment-to-autumn .spring-flowers-distant,
+body.environment-from-spring.environment-to-autumn .spring-flowers-mid,
+body.environment-from-spring.environment-to-autumn .spring-flowers,
+body.environment-from-spring.environment-to-autumn #butterfliesContainer,
+body.environment-from-spring.environment-to-autumn #petalCanvas {
+  transition-delay: 0s;
+}
+/* Autumn world fades in with slight delay after spring elements start leaving */
+body.environment-to-autumn .autumn-world { transition-delay: .5s; }
+body.environment-to-autumn #leafCanvas { transition: opacity 3s ease 2.2s; }
+
+/* ─── Autumn → Monsoon transition ──────────────────────────────────────── */
+body.environment-from-autumn.environment-to-monsoon .autumn-world,
+body.environment-from-autumn.environment-to-monsoon .autumn-sunlight,
+body.environment-from-autumn.environment-to-monsoon .autumn-foliage-far,
+body.environment-from-autumn.environment-to-monsoon .autumn-foliage-near,
+body.environment-from-autumn.environment-to-monsoon #leafCanvas {
+  transition-delay: 0s;
+}
+body.environment-from-autumn.environment-to-monsoon .cloud-glow { opacity: .86; transition: opacity 3.2s ease 1.1s; }
+body.environment-from-autumn.environment-to-monsoon #rainCanvas { transition: opacity 3.0s ease 1.1s; }
+
+/* ─── Autumn transition mist duration ──────────────────────────────────── */
+body.environment-transitioning.environment-to-autumn .environment-mist,
+body.environment-transitioning.environment-from-autumn .environment-mist { animation-duration: 4.2s; }
+
+/* ─── Autumn keyframes ──────────────────────────────────────────────────── */
+@keyframes autumn-haze-breathe {
+  0%   { opacity: .35; transform: translate3d(0%, 0%, 0); }
+  35%  { opacity: .48; transform: translate3d(1.2%, -0.4%, 0); }
+  70%  { opacity: .40; transform: translate3d(-0.8%, 0.3%, 0); }
+  100% { opacity: .44; transform: translate3d(0.5%, -0.2%, 0); }
+}
+
+@keyframes autumn-foliage-sway {
+  0%   { transform: translate3d(0%, 0%, 0) rotate(-0.2deg); }
+  30%  { transform: translate3d(0.6%, -0.3%, 0) rotate(0.3deg); }
+  65%  { transform: translate3d(-0.4%, 0.2%, 0) rotate(-0.15deg); }
+  100% { transform: translate3d(0.3%, -0.1%, 0) rotate(0.2deg); }
+}
+
+/* ─── Responsive autumn adjustments ────────────────────────────────────── */
+@media (min-width: 761px) and (min-aspect-ratio: 19 / 10) {
+  .autumn-scene-image { --scene-position: 50% 18%; }
+}
+
+@media (max-width: 760px) {
+  .autumn-scene-image {
+    --scene-fit: cover;
+    --scene-position: 31% 50%;
+  }
+  .autumn-foliage-far { inset: 20% -6% 30% 8%; }
+  .autumn-foliage-near { inset: 34% -18% 10% 10%; }
+}
+
+/* ─── Reduced motion autumn ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .autumn-haze,
+  .autumn-foliage-far,
+  .autumn-foliage-near { animation: none; }
+  .autumn-world,
+  .autumn-scene-image,
+  .autumn-haze,
+  .autumn-sunlight,
+  .autumn-foliage-far,
+  .autumn-foliage-near,
+  #leafCanvas { transition-duration: 1.1s; transition-delay: 0s; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FIFTH LISTENING WORLD: REGISTAN / THAR
+   The permanent veranda opens onto a restrained Rajasthan desert evening.
+═══════════════════════════════════════════════════════════════════════════ */
+
+.desert-world,
+.desert-scene-image,
+.desert-haze,
+.desert-sunlight,
+#sandCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.desert-world {
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(1.016);
+  transition: opacity 3.7s ease .38s, transform 4.3s cubic-bezier(.2,.75,.2,1);
+}
+
+.desert-scene-image {
+  --scene-art: url("assets/images/desert/veranda-thar-refined-v3.png");
+  --scene-fit: cover;
+  --scene-position: 50% 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background: #21160d;
+  filter: saturate(.86) brightness(.86) contrast(1.04);
+  transform: scale(1.012);
+  transition: filter 4.2s ease, transform 4.4s cubic-bezier(.2,.75,.2,1);
+}
+
+.desert-haze {
+  z-index: 2;
+  background:
+    radial-gradient(ellipse at 68% 42%, rgba(221,173,112,.18), transparent 47%),
+    linear-gradient(180deg, rgba(224,171,105,.08), rgba(173,118,68,.08) 54%, transparent 82%);
+  mix-blend-mode: screen;
+  opacity: .24;
+  filter: blur(8px);
+  animation: desert-haze-breathe 20s ease-in-out infinite alternate;
+  transition: opacity 2.4s ease, transform 5.8s ease;
+}
+
+.desert-sunlight {
+  z-index: 2;
+  background:
+    linear-gradient(112deg, rgba(255,198,122,.12), transparent 42%),
+    radial-gradient(ellipse at 30% 3%, rgba(255,211,154,.13), transparent 43%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 3.2s ease 1.05s;
+}
+
+#sandCanvas {
+  z-index: 3;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 2.6s ease 1.3s;
+}
+
+body.entered[data-environment="desert"] {
+  --mint: #e5bd78;
+  --border: rgba(231,199,143,.15);
+}
+
+body[data-environment="desert"] .desert-world { opacity: 1; transform: scale(1); }
+body[data-environment="desert"] .desert-scene-image {
+  filter: saturate(.94) brightness(.94) contrast(1.02);
+  transform: scale(1);
+}
+body[data-environment="desert"] .desert-sunlight { opacity: .46; }
+body[data-environment="desert"] .desert-haze { opacity: .30; }
+body[data-environment="desert"] .scene-image,
+body[data-environment="desert"] .winter-world,
+body[data-environment="desert"] .spring-world,
+body[data-environment="desert"] .autumn-world { opacity: 0; transform: scale(1.022); }
+body[data-environment="desert"] #rainCanvas,
+body[data-environment="desert"] #snowCanvas,
+body[data-environment="desert"] #petalCanvas,
+body[data-environment="desert"] #leafCanvas,
+body[data-environment="desert"] #butterfliesContainer,
+body[data-environment="desert"] .window-rain,
+body[data-environment="desert"] .cloud-glow,
+body[data-environment="desert"] .headlights { opacity: 0; }
+
+body[data-environment="desert"][data-rain-mode="light"] #sandCanvas { opacity: .28; }
+body[data-environment="desert"][data-rain-mode="medium"] #sandCanvas { opacity: .42; }
+body[data-environment="desert"][data-rain-mode="heavy"] #sandCanvas { opacity: .58; }
+body[data-environment="desert"][data-rain-mode="storm"] #sandCanvas { opacity: .72; }
+body[data-environment="desert"][data-rain-mode="medium"] .desert-haze { opacity: .32; animation-duration: 17s; }
+body[data-environment="desert"][data-rain-mode="heavy"] .desert-haze { opacity: .35; animation-duration: 13s; }
+body[data-environment="desert"][data-rain-mode="storm"] .desert-haze { opacity: .38; animation-duration: 9s; }
+body[data-environment="desert"].desert-gust-event #sandCanvas { opacity: .9; transition-delay: 0s; }
+body[data-environment="desert"].desert-gust-event .desert-haze { opacity: .54; transform: translate3d(3%, 0, 0) scale(1.04); }
+body[data-environment="desert"].desert-haze-event .desert-haze { opacity: .58; transform: translate3d(5%, -1%, 0) scale(1.07); }
+body[data-environment="desert"].desert-sun-event .desert-sunlight { opacity: .72; transition-delay: 0s; }
+
+body.environment-from-autumn.environment-to-desert .autumn-world,
+body.environment-from-autumn.environment-to-desert .autumn-sunlight,
+body.environment-from-autumn.environment-to-desert .autumn-foliage-far,
+body.environment-from-autumn.environment-to-desert .autumn-foliage-near,
+body.environment-from-autumn.environment-to-desert #leafCanvas { transition-delay: 0s; }
+body.environment-to-desert .desert-world { transition-delay: .45s; }
+body.environment-to-desert #sandCanvas { transition-delay: 1.7s; }
+body.environment-transitioning.environment-to-desert .environment-mist {
+  background:
+    radial-gradient(ellipse at 58% 46%, rgba(219,180,126,.5), transparent 58%),
+    linear-gradient(90deg, transparent 8%, rgba(205,163,109,.22) 52%, transparent 94%);
+  animation-duration: 4.2s;
+}
+
+body.environment-from-desert.environment-to-monsoon .desert-world,
+body.environment-from-desert.environment-to-monsoon .desert-haze,
+body.environment-from-desert.environment-to-monsoon .desert-sunlight,
+body.environment-from-desert.environment-to-monsoon #sandCanvas { transition-delay: 0s; }
+body.environment-from-desert.environment-to-monsoon .cloud-glow { opacity: .86; transition: opacity 3.2s ease 1.1s; }
+body.environment-from-desert.environment-to-monsoon #rainCanvas { transition: opacity 3s ease 1.1s; }
+body.environment-transitioning.environment-from-desert .environment-mist { animation-duration: 4.2s; }
+
+body[data-environment="desert"] .radio-console {
+  background:
+    linear-gradient(150deg, rgba(40,30,21,.84), rgba(16,12,9,.79)),
+    rgba(13,10,7,.64);
+  backdrop-filter: blur(22px) saturate(.76);
+  -webkit-backdrop-filter: blur(22px) saturate(.76);
+}
+
+@keyframes desert-haze-breathe {
+  from { opacity: .22; transform: translate3d(-1.5%, 0, 0) scale(1); }
+  to { opacity: .34; transform: translate3d(2.5%, -.4%, 0) scale(1.025); }
+}
+
+@media (min-width: 761px) and (min-aspect-ratio: 19 / 10) {
+  .desert-scene-image { --scene-position: 50% 20%; }
+}
+
+@media (max-width: 760px) {
+  .desert-scene-image {
+    --scene-fit: cover;
+    --scene-position: 31% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desert-haze { animation: none; }
+  .desert-world,
+  .desert-scene-image,
+  .desert-haze,
+  .desert-sunlight,
+  #sandCanvas { transition-duration: 1.1s; transition-delay: 0s; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIXTH LISTENING WORLD: SAMUNDAR / INDIAN COAST
+   The familiar veranda opens onto a restrained Konkan evening. Motion stays
+   inside the sea band; the foreground artwork itself is never animated.
+═══════════════════════════════════════════════════════════════════════════ */
+
+.coast-world,
+.coast-scene-image,
+.coast-haze,
+.coast-video,
+.coast-foreground {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.coast-world {
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(1.016);
+  transition: opacity 3.7s ease .4s, transform 4.3s cubic-bezier(.2,.75,.2,1);
+}
+
+.coast-scene-image {
+  --scene-art: url("assets/images/coast/veranda-konkan-candidate-v1.png");
+  --scene-fit: cover;
+  --scene-position: 50% 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background: #102027;
+  filter: saturate(.78) brightness(.84) contrast(1.04);
+  transform: scale(1.012);
+  transition: filter 4.2s ease, transform 4.4s cubic-bezier(.2,.75,.2,1);
+}
+
+.coast-video {
+  z-index: 1;
+  object-fit: cover;
+  object-position: 50% 58%;
+  transform: translateY(-7%) scale(1.04);
+  opacity: 0;
+  filter: brightness(.80) saturate(.80) contrast(.97);
+  transition: opacity 1.25s ease, filter 2.4s ease;
+  background: transparent;
+}
+
+body[data-environment="coast"].coast-video-ready .coast-video { opacity: 1; }
+
+.coast-foreground {
+  z-index: 4;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+.coast-haze {
+  z-index: 2;
+  background:
+    radial-gradient(ellipse at 64% 31%, rgba(182,207,206,.13), transparent 48%),
+    linear-gradient(180deg, rgba(202,178,143,.07), rgba(109,152,159,.08) 48%, transparent 70%);
+  mix-blend-mode: screen;
+  opacity: .2;
+  filter: blur(9px);
+  transition: opacity 2.6s ease, transform 5.6s ease;
+}
+
+body.entered[data-environment="coast"] {
+  --mint: #b9d9d4;
+  --border: rgba(183,216,211,.15);
+}
+
+body[data-environment="coast"] .coast-world { opacity: 1; transform: scale(1); }
+body[data-environment="coast"] .coast-scene-image {
+  filter: saturate(.88) brightness(.92) contrast(1.02);
+  transform: scale(1);
+}
+body[data-environment="coast"] .coast-haze { opacity: .27; }
+body[data-environment="coast"] .scene-image,
+body[data-environment="coast"] .winter-world,
+body[data-environment="coast"] .spring-world,
+body[data-environment="coast"] .autumn-world,
+body[data-environment="coast"] .desert-world { opacity: 0; transform: scale(1.022); }
+body[data-environment="coast"] #rainCanvas,
+body[data-environment="coast"] #snowCanvas,
+body[data-environment="coast"] #petalCanvas,
+body[data-environment="coast"] #leafCanvas,
+body[data-environment="coast"] #sandCanvas,
+body[data-environment="coast"] #butterfliesContainer,
+body[data-environment="coast"] .window-rain,
+body[data-environment="coast"] .cloud-glow,
+body[data-environment="coast"] .headlights { opacity: 0; }
+
+body[data-environment="coast"].coast-breeze-event .coast-haze { opacity: .38; transform: translate3d(1.5%,0,0) scale(1.02); }
+body[data-environment="coast"].coast-mist-event .coast-haze { opacity: .46; transform: translate3d(2%,-.4%,0) scale(1.035); }
+
+body.environment-from-desert.environment-to-coast .desert-world,
+body.environment-from-desert.environment-to-coast .desert-haze,
+body.environment-from-desert.environment-to-coast .desert-sunlight,
+body.environment-from-desert.environment-to-coast #sandCanvas { transition-delay: 0s; }
+body.environment-to-coast .coast-world { transition-delay: .55s; }
+body.environment-to-coast .coast-video { transition-delay: 1.15s; }
+body.environment-transitioning.environment-to-coast .environment-mist {
+  background:
+    radial-gradient(ellipse at 58% 44%, rgba(185,191,176,.48), transparent 57%),
+    linear-gradient(90deg, transparent 6%, rgba(153,181,181,.2) 53%, transparent 94%);
+  animation-duration: 4.2s;
+}
+
+body.environment-from-coast.environment-to-monsoon .coast-world,
+body.environment-from-coast.environment-to-monsoon .coast-haze,
+body.environment-from-coast.environment-to-monsoon .coast-video { transition-delay: 0s; }
+body.environment-from-coast.environment-to-monsoon .cloud-glow { opacity: .86; transition: opacity 3.2s ease 1.05s; }
+body.environment-from-coast.environment-to-monsoon #rainCanvas { transition: opacity 3s ease 1.1s; }
+body.environment-transitioning.environment-from-coast .environment-mist { animation-duration: 4.2s; }
+
+body[data-environment="coast"] .radio-console {
+  background:
+    linear-gradient(150deg, rgba(22,39,43,.84), rgba(7,17,21,.79)),
+    rgba(6,15,18,.64);
+  backdrop-filter: blur(22px) saturate(.76);
+  -webkit-backdrop-filter: blur(22px) saturate(.76);
+}
+
+@media (min-width: 761px) and (min-aspect-ratio: 19 / 10) {
+  .coast-scene-image { --scene-position: 50% 20%; }
+  .coast-video { object-position: 50% 70%; }
+  .coast-foreground { object-position: 50% 20%; }
+}
+
+@media (max-width: 760px) {
+  .coast-scene-image {
+    --scene-fit: cover;
+    --scene-position: 31% 50%;
+  }
+  .coast-video {
+    object-position: 28% 54%;
+    transform: translateY(-17%) scale(1.04);
+  }
+  .coast-foreground { object-position: 31% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coast-video { display: none; }
+  .coast-world,
+  .coast-scene-image,
+  .coast-haze,
+  .coast-video,
+  .coast-foreground { transition-duration: 1.1s; transition-delay: 0s; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHAI PE CHAT — a temporary live mehfil over the listening room
+═══════════════════════════════════════════════════════════════════════════ */
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.chai-hotspot::before {
+  content: "chai pe chat";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 219, 167, .15);
+  border-radius: 999px;
+  background: rgba(9, 11, 11, .52);
+  color: rgba(255, 230, 191, .72);
+  font: 700 7px/1 Inter, ui-sans-serif, sans-serif;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition: opacity .35s ease, transform .35s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.entered .chai-hotspot:hover::before,
+.entered .chai-hotspot:focus-visible::before { opacity: 1; transform: translate(-50%, 0); }
+
+.chat-drawer {
+  position: absolute;
+  z-index: 32;
+  top: max(18px, env(safe-area-inset-top));
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  width: min(430px, calc(100vw - 36px));
+  min-height: 0;
+  padding: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 221, 173, .14);
+  border-radius: 24px;
+  background:
+    linear-gradient(155deg, rgba(30, 26, 22, .88), rgba(5, 9, 11, .91)),
+    rgba(5, 9, 12, .88);
+  box-shadow: 0 32px 100px rgba(0, 0, 0, .64), inset 0 1px rgba(255, 255, 255, .04);
+  backdrop-filter: blur(30px) saturate(.78);
+  -webkit-backdrop-filter: blur(30px) saturate(.78);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(38px) scale(.985);
+  transition: opacity .36s ease, transform .36s cubic-bezier(.2, .8, .2, 1);
+}
+
+.chat-open .chat-drawer { opacity: 1; pointer-events: auto; transform: none; }
+
+.chat-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.chat-head p {
+  margin: 0 0 7px;
+  color: #e9b974;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .2em;
+}
+
+.chat-head h2 {
+  margin: 0;
+  font: 400 25px/1.05 Georgia, "Times New Roman", serif;
+  letter-spacing: .015em;
+}
+
+.chat-head h2 span { font-size: .76em; }
+.chat-head small { display: block; margin-top: 7px; color: rgba(255,255,255,.46); font-size: 9px; }
+.chat-head-actions { display: flex; gap: 5px; }
+
+.chat-close,
+.chat-name-edit {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 50%;
+  background: rgba(255,255,255,.025);
+  color: rgba(255,255,255,.72);
+  cursor: pointer;
+}
+
+.chat-close { font: 25px/1 Georgia, serif; }
+.chat-name-edit { font-size: 14px; }
+.chat-close:hover,
+.chat-name-edit:hover { border-color: rgba(233,185,116,.36); color: #f0c88d; }
+
+.chat-name-gate {
+  width: min(310px, 100%);
+  margin: auto;
+  text-align: center;
+}
+
+.chat-name-gate > p { margin: 0 0 16px; font-size: 28px; }
+.chat-name-gate h3 { margin: 0 0 25px; font: 400 25px/1.2 Georgia, "Times New Roman", serif; }
+.chat-name-gate label { display: block; margin: 0 0 7px; color: rgba(255,255,255,.48); font-size: 8px; letter-spacing: .14em; text-align: left; text-transform: uppercase; }
+.chat-name-gate input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 13px;
+  outline: none;
+  background: rgba(255,255,255,.04);
+  color: #fff;
+  font: 15px Inter, ui-sans-serif, sans-serif;
+}
+.chat-name-gate input:focus { border-color: rgba(233,185,116,.55); box-shadow: 0 0 0 3px rgba(233,185,116,.08); }
+.chat-field-error { min-height: 17px; margin: 7px 0; color: #e5a39e; font-size: 9px; text-align: left; }
+.chat-name-gate > button,
+.chat-composer > button {
+  min-height: 44px;
+  border: 1px solid rgba(233,185,116,.28);
+  border-radius: 13px;
+  background: linear-gradient(135deg, rgba(233,185,116,.2), rgba(166,108,54,.12));
+  color: #f4d3a3;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.chat-name-gate > button { width: 100%; }
+
+.chat-room { display: flex; flex: 1; min-height: 0; flex-direction: column; }
+.chat-room[hidden], .chat-name-gate[hidden] { display: none; }
+.chat-status { min-height: 23px; padding: 7px 2px 5px; color: #d39a94; font-size: 8px; letter-spacing: .04em; }
+.chat-status.connected { color: rgba(185,217,212,.65); }
+
+.chat-stream {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  padding: 5px 6px 18px 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: rgba(255,255,255,.15) transparent;
+}
+
+.chat-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 9px;
+  color: rgba(255,255,255,.38);
+  text-align: center;
+}
+.chat-empty[hidden] { display: none; }
+.chat-empty span { font-size: 22px; opacity: .6; }
+.chat-empty p { margin: 0; font: 14px Georgia, serif; }
+
+.chat-message {
+  margin: 9px 0;
+  padding: 12px 13px 10px;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 15px;
+  background: rgba(255,255,255,.028);
+}
+.chat-message header { display: flex; align-items: center; gap: 6px; }
+.chat-message header strong { color: #efc88f; font-size: 11px; }
+.chat-message header span { font-size: 11px; }
+.chat-message header time { margin-left: auto; color: rgba(255,255,255,.3); font-size: 8px; }
+.chat-message-copy { margin: 8px 0 9px; color: rgba(255,255,255,.84); font-size: 12px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat-message-reply { display: grid; gap: 3px; margin-top: 8px; padding: 7px 9px; border-left: 2px solid rgba(233,185,116,.38); background: rgba(0,0,0,.13); color: rgba(255,255,255,.48); font-size: 9px; }
+.chat-message-reply strong { color: rgba(239,200,143,.72); }
+.chat-message-reply span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-message-actions { display: flex; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.chat-message-actions::-webkit-scrollbar { display: none; }
+.chat-message-actions button {
+  flex: 0 0 auto;
+  min-width: 27px;
+  min-height: 26px;
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: rgba(255,255,255,.43);
+  font-size: 9px;
+  cursor: pointer;
+}
+.chat-message-actions button:hover,
+.chat-message-actions button.active { border-color: rgba(233,185,116,.18); background: rgba(233,185,116,.08); color: #efc88f; }
+.chat-message-actions button:disabled { cursor: default; opacity: .55; }
+
+.chat-new-messages {
+  align-self: center;
+  margin: -12px 0 5px;
+  padding: 6px 10px;
+  border: 1px solid rgba(233,185,116,.2);
+  border-radius: 999px;
+  background: rgba(25,20,16,.9);
+  color: #e8bd80;
+  font-size: 8px;
+  cursor: pointer;
+}
+
+.chat-reply-context {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border-left: 2px solid #dca963;
+  background: rgba(233,185,116,.055);
+}
+.chat-reply-context[hidden] { display: none; }
+.chat-reply-context div { display: grid; min-width: 0; gap: 2px; }
+.chat-reply-context small { color: rgba(255,255,255,.35); font-size: 7px; text-transform: uppercase; }
+.chat-reply-context strong { color: #e8bd80; font-size: 9px; }
+.chat-reply-context span { overflow: hidden; color: rgba(255,255,255,.5); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.chat-reply-context button { margin-left: auto; border: 0; background: transparent; color: rgba(255,255,255,.55); cursor: pointer; }
+
+.chat-composer { display: flex; align-items: flex-end; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.07); }
+.chat-composer textarea {
+  flex: 1;
+  min-height: 44px;
+  max-height: 110px;
+  padding: 12px 13px;
+  resize: none;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 13px;
+  outline: 0;
+  background: rgba(255,255,255,.035);
+  color: #fff;
+  font: 12px/1.45 Inter, ui-sans-serif, sans-serif;
+}
+.chat-composer textarea:focus { border-color: rgba(233,185,116,.48); }
+.chat-composer > button { min-width: 82px; padding: 0 12px; }
+.chat-composer textarea:disabled,
+.chat-composer button:disabled { cursor: not-allowed; opacity: .46; }
+
+.chat-open .radio-console { right: min(466px, 34vw); }
+.chat-open.ui-idle .radio-console { opacity: .7; }
+.chat-launch { margin-left: auto; font-size: 12px; }
+.chat-launch + #playlistButton { margin-left: 0; }
+
+.chat-drawer button:focus-visible,
+.chat-drawer input:focus-visible,
+.chat-drawer textarea:focus-visible,
+.chat-stream:focus-visible { outline: 2px solid rgba(233,185,116,.75); outline-offset: 2px; }
+
+@media (max-width: 900px) {
+  .chat-open .radio-console { opacity: .22; }
+}
+
+@media (max-width: 760px) {
+  .entered .chai-hotspot::before { opacity: .72; transform: translate(-50%, 0); }
+  .chat-drawer {
+    top: max(8px, env(safe-area-inset-top));
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    width: calc(100vw - 16px);
+    padding: 18px 14px max(12px, env(safe-area-inset-bottom));
+    border-radius: 21px;
+  }
+  .chat-head { padding: 0 1px 13px; }
+  .chat-head h2 { font-size: 22px; }
+  .chat-head small { margin-top: 5px; }
+  .chat-close, .chat-name-edit { width: 40px; height: 40px; }
+  .chat-status { padding-left: 1px; }
+  .chat-message { padding: 11px 12px 9px; }
+  .chat-message-copy { font-size: 13px; }
+  .chat-message-actions button { min-height: 31px; padding-inline: 7px; }
+  .chat-composer { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
+  .chat-composer textarea { font-size: 16px; }
+  .chat-composer > button { min-width: 76px; }
+  .chat-open .radio-console { opacity: 0; pointer-events: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-drawer { transition-duration: .001ms; }
 }
