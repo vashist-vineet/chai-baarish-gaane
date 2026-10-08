@@ -66,8 +66,15 @@
   function setStatus(copy, connected = state.connected) {
     els.status.textContent = copy;
     els.status.classList.toggle("connected", connected);
+    els.launch?.classList.toggle("connected", connected);
     els.send.disabled = !connected;
     els.message.disabled = !connected;
+  }
+
+  function setOpenState(open) {
+    [els.launch, els.chai].filter(Boolean).forEach((trigger) => {
+      trigger.setAttribute("aria-expanded", String(open));
+    });
   }
 
   function presenceCopy(count) {
@@ -159,6 +166,7 @@
     if (document.body.classList.contains("playlist-open")) els.playlistClose?.click();
     state.open = true;
     document.body.classList.add("chat-open");
+    setOpenState(true);
     els.drawer.removeAttribute("inert");
     els.drawer.setAttribute("aria-hidden", "false");
     if (!state.name) {
@@ -181,10 +189,11 @@
     state.joined = false;
     state.socket?.emit("chat:leave");
     document.body.classList.remove("chat-open");
+    setOpenState(false);
     els.drawer.setAttribute("aria-hidden", "true");
     els.drawer.setAttribute("inert", "");
     cancelReply();
-    els.chai.focus();
+    (els.launch || els.chai).focus();
   }
 
   function showNameGate(editing = false) {
@@ -356,7 +365,6 @@
     els.message.focus();
   }
 
-  els.chai.setAttribute("aria-label", "Open Chai Pe Chat");
   els.chai.addEventListener("click", openChat);
   els.launch?.addEventListener("click", openChat);
   els.close.addEventListener("click", closeChat);

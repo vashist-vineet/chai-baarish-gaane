@@ -27,7 +27,7 @@
     <link rel="preload" href="assets/images/autumn/veranda-himalayan-autumn.jpg" as="image" type="image/jpeg" />
     <link rel="preconnect" href="https://www.youtube.com" />
     <link rel="dns-prefetch" href="https://i.ytimg.com" />
-    <link rel="stylesheet" href="style.css?v=playlist-20261008-1" />
+    <link rel="stylesheet" href="style.css?v=chat-discovery-20261008-1" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -126,21 +126,33 @@
         </div>
       </header>
 
-      <button class="chai-hotspot scene-ui" id="chaiHotspot" aria-label="Pick up the chai">
+      <button class="chai-hotspot scene-ui" id="chaiHotspot" aria-label="Open Chai Pe Chat" aria-controls="chatDrawer" aria-expanded="false">
         <span class="steam steam-one"></span>
         <span class="steam steam-two"></span>
         <span class="chai-ring"></span>
       </button>
 
       <p class="weather-note scene-ui" id="weatherNote">MUMBAI · 7:14 PM</p>
-      <div class="environment-switch scene-ui" id="environmentSwitch">
-        <button id="environmentButton" aria-label="Change weather to winter">
-          <span class="environment-copy">
-            <small id="environmentHint">baarish se bore ho gaye?</small>
-            <strong id="environmentButtonText">mausam badlo</strong>
-          </span>
-          <b aria-hidden="true">→</b>
-        </button>
+      <div class="top-actions scene-ui" id="topActions">
+        <div class="chat-switch">
+          <button id="chatButton" type="button" aria-label="Open Chai Pe Chat" aria-controls="chatDrawer" aria-expanded="false">
+            <span class="chat-switch-icon" aria-hidden="true">☕</span>
+            <span class="chat-switch-copy">
+              <small>live mehfil</small>
+              <strong>chai pe chat</strong>
+            </span>
+            <span class="chat-switch-status" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="environment-switch" id="environmentSwitch">
+          <button id="environmentButton" aria-label="Change weather to winter">
+            <span class="environment-copy">
+              <small id="environmentHint">baarish se bore ho gaye?</small>
+              <strong id="environmentButtonText">mausam badlo</strong>
+            </span>
+            <b aria-hidden="true">→</b>
+          </button>
+        </div>
       </div>
       <div class="headlights scene-ui" id="headlights" aria-hidden="true"></div>
 
@@ -148,7 +160,6 @@
         <div class="radio-topline">
           <span class="live-dot" aria-hidden="true"></span>
           <span>PURANE GAANE</span>
-          <button class="icon-button small chat-launch" id="chatButton" aria-label="Open Chai Pe Chat" title="Chai Pe Chat">☕</button>
           <button class="icon-button small" id="playlistButton" aria-label="Open playlist" title="Playlist">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h11M4 11h11M4 16h7M19 5v10.5a2.5 2.5 0 1 1-2-2.45V5h2Z"/></svg>
           </button>
@@ -364,6 +375,6 @@
     </noscript>
     <script src="playlist.js?v=playlist-20261008-1"></script>
     <script src="script.js?v=playlist-20261008-1" defer></script>
-    <script src="chat.js?v=20260821-1" defer></script>
+    <script src="chat.js?v=chat-discovery-20261008-1" defer></script>
   </body>
 </html>
