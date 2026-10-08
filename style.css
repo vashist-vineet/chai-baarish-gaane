@@ -758,6 +758,10 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
 .mood-filters::-webkit-scrollbar { display: none; }
 .mood-filters button { flex: 0 0 auto; padding: 7px 9px; border: 1px solid rgba(255,255,255,.08); }
 
+/* Decade filter row — inherits .mood-filters layout, distinct active colour */
+.decade-filters { margin-top: -8px; margin-bottom: 16px; }
+.decade-filters button.active { background: rgba(255, 196, 100, 0.12); color: #ffc464; border-color: rgba(255, 196, 100, 0.35); }
+
 .playlist {
   min-height: 0;
   margin: 0;
@@ -768,6 +772,13 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
 }
 
 .playlist li { border-top: 1px solid rgba(255,255,255,.065); }
+
+.playlist .playlist-empty {
+  padding: 28px 10px;
+  color: rgba(255,255,255,.42);
+  font: 13px/1.5 Georgia, "Times New Roman", serif;
+  text-align: center;
+}
 
 .playlist button {
   display: grid;
