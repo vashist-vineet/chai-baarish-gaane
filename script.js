@@ -35,7 +35,7 @@
       placeLabel: "VERANDA",
       toast: "Phir se baarish.",
       modeToasts: Object.freeze({ light: "Halki si baarish.", medium: "Theek-thaak monsoon.", heavy: "Baarish rukne wali nahi.", storm: "Chhatri se kuch nahi hoga." }),
-      drawerKicker: "36 GAANE · ONE LONG BAARISH",
+      drawerKicker: "ONE LONG BAARISH",
       drawerTitle: "Shaam ki cassette"
     }),
     winter: Object.freeze({
@@ -56,7 +56,7 @@
       placeLabel: "SARDI / PAHAAD",
       toast: "Sweater le aana chahiye tha.",
       modeToasts: Object.freeze({ light: "Bas halki si baraf.", medium: "Baraf tikne lagi.", heavy: "Raat bhar giregi.", storm: "Hawa tez ho gayi." }),
-      drawerKicker: "36 GAANE · ONE COLD EVENING",
+      drawerKicker: "ONE COLD EVENING",
       drawerTitle: "Sardiyon ki cassette"
     }),
     spring: Object.freeze({
@@ -77,7 +77,7 @@
       placeLabel: "BAHAR / PAHAAD",
       toast: "Bahar aa gayi.",
       modeToasts: Object.freeze({ light: "Hawa bilkul halki.", medium: "Naram si hawa.", heavy: "Phool hilne lage.", storm: "Hawa mein kuch toh hai." }),
-      drawerKicker: "36 GAANE · ONE FRESH EVENING",
+      drawerKicker: "ONE FRESH EVENING",
       drawerTitle: "Bahar ki cassette"
     }),
     autumn: Object.freeze({
@@ -98,7 +98,7 @@
       placeLabel: "PATJHAD / PAHAAD",
       toast: "Patjhad aa gaya.",
       modeToasts: Object.freeze({ light: "Hawa ruk gayi.", medium: "Pattey hilne lage.", heavy: "Hawa chal padi.", storm: "Aaj tez hawa hai." }),
-      drawerKicker: "36 GAANE · ONE GOLDEN EVENING",
+      drawerKicker: "ONE GOLDEN EVENING",
       drawerTitle: "Patjhad ki cassette"
     }),
     desert: Object.freeze({
@@ -119,7 +119,7 @@
       placeLabel: "REGISTAN / RAJASTHAN",
       toast: "Registan aa gaya.",
       modeToasts: Object.freeze({ light: "Hawa tham gayi.", medium: "Halki si sookhi hawa.", heavy: "Ret sarakne lagi.", storm: "Ret udne lagi." }),
-      drawerKicker: "36 GAANE · ONE DUSTY EVENING",
+      drawerKicker: "ONE DUSTY EVENING",
       drawerTitle: "Registan ki cassette"
     }),
     coast: Object.freeze({
@@ -140,7 +140,7 @@
       placeLabel: "SAMUNDAR / KINARA",
       toast: "Samundar aa gaya.",
       modeToasts: Object.freeze({ light: "Samundar bilkul shaant.", medium: "Lehrein dheere chal rahi hain.", heavy: "Hawa samundar se aa rahi hai.", storm: "Lehrein tez ho gayi." }),
-      drawerKicker: "36 GAANE · ONE COASTAL EVENING",
+      drawerKicker: "ONE COASTAL EVENING",
       drawerTitle: "Samundar ki cassette"
     })
   });
@@ -198,12 +198,18 @@
     closePlaylist: $("#closePlaylist"),
     playlist: $("#playlist"),
     moodFilters: $("#moodFilters"),
+    decadeFilters: $("#decadeFilters"),
     share: $("#shareButton"),
     fullscreen: $("#fullscreenButton"),
     toast: $("#toast")
   };
 
   const saved = readPreferences();
+  const availableMoods = new Set([
+    "all",
+    ...playlist.flatMap((track) => Array.isArray(track.moods) ? track.moods : [track.mood]).filter(Boolean)
+  ]);
+  const availableDecades = new Set(["all", ...playlist.map((track) => track.decade).filter(Boolean)]);
   const state = {
     entered: false,
     entryStarted: false,
@@ -211,7 +217,9 @@
     isPlaying: false,
     playIntent: false,
     currentTrackIndex: Math.min(saved.currentTrack || 0, Math.max(playlist.length - 1, 0)),
-    selectedMood: saved.selectedMood || "all",
+    selectedMood: availableMoods.has(saved.selectedMood) ? saved.selectedMood : "all",
+    selectedDecade: availableDecades.has(saved.selectedDecade) ? saved.selectedDecade : "all",
+    recentHistory: [],
     environment: Object.hasOwn(ENVIRONMENTS, saved.environment) ? saved.environment : "monsoon",
     environmentTransitioning: false,
     rainMode: saved.rainMode || "heavy",
@@ -1732,6 +1740,7 @@
         audioMixVersion: AUDIO_MIX_VERSION,
         currentTrack: state.currentTrackIndex,
         selectedMood: state.selectedMood,
+        selectedDecade: state.selectedDecade,
         environment: state.environment,
         rainMode: state.rainMode,
         rainVolume: state.rainVolume,
@@ -1776,7 +1785,7 @@
     els.shuffle.setAttribute("aria-label", shuffleLabel);
     els.shuffle.title = state.shuffleEnabled ? `${shuffleLabel} on` : shuffleLabel;
     els.share.textContent = config.shareLabel;
-    els.drawerKicker.textContent = config.drawerKicker;
+    els.drawerKicker.textContent = `${playlist.length} GAANE · ${config.drawerKicker}`;
     els.drawerTitle.textContent = config.drawerTitle;
     updateTrackUI({ preserveProgress: true });
     updateClock();
@@ -1823,10 +1832,22 @@
     }, delay);
   }
 
+  // Support both current moods[] entries and legacy mood strings.
+  function trackMatchesMood(track, mood) {
+    if (mood === "all") return true;
+    if (Array.isArray(track.moods)) return track.moods.includes(mood);
+    return track.mood === mood;
+  }
+
+  function trackMatchesDecade(track, decade) {
+    if (decade === "all") return true;
+    return track.decade === decade;
+  }
+
   function filteredIndices() {
     return playlist
       .map((track, index) => ({ track, index }))
-      .filter(({ track }) => state.selectedMood === "all" || track.mood === state.selectedMood)
+      .filter(({ track }) => trackMatchesMood(track, state.selectedMood) && trackMatchesDecade(track, state.selectedDecade))
       .map(({ index }) => index);
   }
 
@@ -1839,7 +1860,9 @@
     if (!track) return;
     els.title.textContent = track.title;
     els.artist.textContent = `${track.artist} · ${track.film}`;
-    const pickLabel = state.environment === "monsoon" ? track.mood : ENVIRONMENTS[state.environment].pickLabel;
+    // Show the first current mood or the legacy mood value in the Monsoon label.
+    const primaryMood = Array.isArray(track.moods) ? track.moods[0] : (track.mood || "");
+    const pickLabel = state.environment === "monsoon" ? (primaryMood || "baarish") : ENVIRONMENTS[state.environment].pickLabel;
     els.mood.textContent = `${pickLabel} pick · ${track.year}`;
     els.console.dataset.trackIndex = String(state.currentTrackIndex);
     els.console.dataset.youtubeId = track.youtubeId;
@@ -1853,6 +1876,10 @@
 
   function renderPlaylist() {
     const indices = filteredIndices();
+    if (!indices.length) {
+      els.playlist.innerHTML = '<li class="playlist-empty">Is mood aur era mein abhi koi gaana nahi.</li>';
+      return;
+    }
     els.playlist.innerHTML = indices.map((index, listIndex) => {
       const track = playlist[index];
       return `<li data-index="${index}" class="${index === state.currentTrackIndex ? "current" : ""}">
@@ -1880,6 +1907,22 @@
       .map(({ index }) => index);
   }
 
+  function playableFilteredIndices({ includeErrored = false } = {}) {
+    return filteredIndices().filter((index) => (
+      hasValidVideoId(playlist[index]) && (includeErrored || !state.erroredTracks.has(index))
+    ));
+  }
+
+  function sequentialFilteredIndex(direction = 1, fromIndex = state.currentTrackIndex) {
+    const playable = new Set(playableFilteredIndices());
+    if (!playable.size) return null;
+    for (let step = 1; step <= playlist.length; step += 1) {
+      const candidate = (fromIndex + direction * step + playlist.length * 2) % playlist.length;
+      if (playable.has(candidate)) return candidate;
+    }
+    return playable.has(fromIndex) ? fromIndex : [...playable][0];
+  }
+
   function sequentialIndex(direction = 1, fromIndex = state.currentTrackIndex) {
     if (!playlist.length) return null;
     const playable = new Set(playableIndices());
@@ -1901,8 +1944,12 @@
   }
 
   function rebuildShuffleQueue(excludeIndex = state.currentTrackIndex) {
-    const pool = playableIndices().filter((index) => index !== excludeIndex);
-    state.shuffleQueue = shuffleArray(pool);
+    const pool = playableFilteredIndices().filter((index) => index !== excludeIndex);
+    // Weighted shuffle: tracks in recentHistory go to back half of queue
+    const recentSet = new Set(state.recentHistory);
+    const fresh = pool.filter((i) => !recentSet.has(i));
+    const recent = pool.filter((i) => recentSet.has(i));
+    state.shuffleQueue = [...shuffleArray(fresh), ...shuffleArray(recent)];
     state.shufflePosition = 0;
   }
 
@@ -1913,7 +1960,7 @@
       state.shufflePosition += 1;
       return candidate;
     }
-    return playableIndices().includes(state.currentTrackIndex) ? state.currentTrackIndex : null;
+    return playableFilteredIndices().includes(state.currentTrackIndex) ? state.currentTrackIndex : null;
   }
 
   function playTrack(index, { autoplay = true, origin = "unknown" } = {}) {
@@ -1922,7 +1969,8 @@
     const preserveExactSelection = !state.shuffleEnabled && (origin === "next" || origin === "playlist");
     if (!hasValidVideoId(track) || (state.erroredTracks.has(index) && !preserveExactSelection)) {
       if (!hasValidVideoId(track)) console.warn("Skipping track with invalid YouTube ID", { index, title: track?.title });
-      const fallback = sequentialIndex(1, index);
+      const filteredFallback = origin === "playlist" ? sequentialFilteredIndex(1, index) : null;
+      const fallback = filteredFallback ?? sequentialIndex(1, index);
       if (fallback === null || fallback === index) return false;
       return playTrack(fallback, { autoplay, origin: "invalid-fallback" });
     }
@@ -1930,6 +1978,8 @@
     const requestId = ++state.playRequestId;
     state.currentTrackIndex = index;
     state.confirmedPlayingRequestId = 0;
+    // Track session history for repeat-repelling (cap at 12)
+    state.recentHistory = [index, ...state.recentHistory.filter((i) => i !== index)].slice(0, 12);
     state.playIntent = autoplay;
     state.playbackRecoveryAttempts = 0;
     state.lastPlaybackPosition = 0;
@@ -1975,10 +2025,10 @@
       nextIndex = nextShuffleIndex();
       if (nextIndex !== null && nextIndex !== state.currentTrackIndex) state.shuffleBackStack.push(state.currentTrackIndex);
     } else {
-      nextIndex = (state.currentTrackIndex + 1) % playlist.length;
+      nextIndex = sequentialFilteredIndex(1);
     }
     if (nextIndex === null) return false;
-    if (nextIndex === state.currentTrackIndex && playableIndices().length > 1) return false;
+    if (nextIndex === state.currentTrackIndex && playableFilteredIndices().length > 1) return false;
     return playTrack(nextIndex, { autoplay, origin });
   }
 
@@ -1986,7 +2036,7 @@
     recordSkip();
     let previousIndex = null;
     if (state.shuffleEnabled && state.shuffleBackStack.length) previousIndex = state.shuffleBackStack.pop();
-    if (previousIndex === null) previousIndex = sequentialIndex(-1);
+    if (previousIndex === null) previousIndex = sequentialFilteredIndex(-1);
     if (previousIndex === null) return false;
     return playTrack(previousIndex, { autoplay: true, origin: "previous" });
   }
@@ -3017,6 +3067,23 @@
       if (!button) return;
       state.selectedMood = button.dataset.mood;
       $$("button", els.moodFilters).forEach((item) => item.classList.toggle("active", item === button));
+      if (state.shuffleEnabled) {
+        state.shuffleBackStack = [];
+        rebuildShuffleQueue();
+      }
+      renderPlaylist();
+      savePreferences();
+    });
+
+    els.decadeFilters.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-decade]");
+      if (!button) return;
+      state.selectedDecade = button.dataset.decade;
+      $$("button", els.decadeFilters).forEach((item) => item.classList.toggle("active", item === button));
+      if (state.shuffleEnabled) {
+        state.shuffleBackStack = [];
+        rebuildShuffleQueue();
+      }
       renderPlaylist();
       savePreferences();
     });
@@ -3107,6 +3174,7 @@
     applyEnvironmentUi(state.environment);
     $$("[data-rain]").forEach((button) => button.classList.toggle("active", button.dataset.rain === state.rainMode));
     $$("[data-mood]", els.moodFilters).forEach((button) => button.classList.toggle("active", button.dataset.mood === state.selectedMood));
+    $$("[data-decade]", els.decadeFilters).forEach((button) => button.classList.toggle("active", button.dataset.decade === state.selectedDecade));
     updateClock();
     setInterval(updateClock, 60000);
     renderPlaylist();
