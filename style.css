@@ -2672,12 +2672,19 @@ body.environment-transitioning.environment-to-spring .environment-mist,
 body.environment-transitioning.environment-from-spring .environment-mist { animation-duration: 4.2s; }
 body.environment-transitioning .environment-switch { opacity: .42; }
 
-.environment-switch {
+.top-actions {
   position: absolute;
   top: max(24px, calc(env(safe-area-inset-top) + 20px));
   right: clamp(24px, 3vw, 44px);
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  transition: opacity .45s ease, transform .45s ease;
+}
+
+.chat-switch,
+.environment-switch {
   overflow: hidden;
-  min-width: 208px;
   border: 1px solid rgba(226,241,239,.16);
   border-radius: 14px;
   background: linear-gradient(145deg, rgba(15,24,27,.66), rgba(5,10,13,.48));
@@ -2688,6 +2695,10 @@ body.environment-transitioning .environment-switch { opacity: .42; }
   transition: opacity .45s ease, transform .45s ease, border-color .45s ease, box-shadow .45s ease;
 }
 
+.chat-switch { min-width: 180px; }
+.environment-switch { min-width: 208px; }
+
+.chat-switch button,
 .environment-switch button {
   display: flex;
   align-items: center;
@@ -2702,6 +2713,58 @@ body.environment-transitioning .environment-switch { opacity: .42; }
   text-align: left;
   cursor: pointer;
   transition: color .25s ease, background .25s ease;
+}
+
+.chat-switch button {
+  gap: 10px;
+  min-height: 61px;
+  padding: 10px 13px;
+}
+
+.chat-switch-icon {
+  flex: 0 0 auto;
+  font-size: 18px;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,.45));
+}
+
+.chat-switch-copy {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.chat-switch-copy small {
+  color: rgba(255,255,255,.5);
+  font: italic 400 10px/1 Georgia, "Times New Roman", serif;
+  letter-spacing: .025em;
+  white-space: nowrap;
+}
+
+.chat-switch-copy strong {
+  color: rgba(255,255,255,.9);
+  font-size: 10px;
+  font-weight: 780;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.chat-switch-status {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.24);
+  box-shadow: 0 0 0 3px rgba(255,255,255,.035);
+  transition: background .3s ease, box-shadow .3s ease;
+}
+
+#chatButton.connected .chat-switch-status {
+  background: var(--mint);
+  box-shadow: 0 0 9px rgba(0,255,204,.6);
 }
 
 .environment-copy {
@@ -2741,13 +2804,19 @@ body.environment-transitioning .environment-switch { opacity: .42; }
   line-height: 1;
   transition: transform .25s ease, filter .25s ease;
 }
+.chat-switch button:hover,
+.chat-switch button:focus-visible,
 .environment-switch button:hover,
-.environment-switch button:focus-visible { color: var(--paper); background: rgba(255,255,255,.035); }
+.environment-switch button:focus-visible { color: var(--paper); background: rgba(255,255,255,.055); }
+.chat-switch button:focus-visible,
+.environment-switch button:focus-visible { outline: 2px solid rgba(143,236,218,.68); outline-offset: -3px; }
 .environment-switch button:hover b,
 .environment-switch button:focus-visible b { transform: translateX(2px); }
 .environment-switch button:disabled { cursor: wait; opacity: .48; }
-.ui-idle .environment-switch { opacity: .62; }
-.playlist-open .environment-switch {
+.ui-idle .top-actions { opacity: .72; }
+.ui-idle .chat-switch { opacity: .82; }
+.playlist-open .top-actions,
+.chat-open .top-actions {
   opacity: 0 !important;
   pointer-events: none;
   transform: translateY(-7px);
@@ -2899,14 +2968,23 @@ body[data-environment="spring"] .radio-console {
   body[data-environment="spring"] .spring-rainbow { opacity: .54; }
   .spring-flowers { inset: 52% -18% -8% 12%; opacity: 0; }
   body[data-environment="spring"] .spring-flowers { opacity: .46; }
-  .environment-switch {
+  .top-actions {
     top: max(76px, calc(env(safe-area-inset-top) + 68px));
     right: max(14px, env(safe-area-inset-right));
-    bottom: auto;
-    left: auto;
-    min-width: 190px;
+    left: max(14px, env(safe-area-inset-left));
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    gap: 8px;
   }
+  .chat-switch,
+  .environment-switch { min-width: 0; }
+  .chat-switch button,
   .environment-switch button { min-height: 58px; padding: 9px 12px 9px 13px; }
+  .chat-switch button { gap: 8px; padding-inline: 10px; }
+  .chat-switch-icon { font-size: 16px; }
+  .chat-switch-copy small { display: none; }
+  .chat-switch-copy strong { font-size: 9px; letter-spacing: .1em; }
+  .chat-switch-status { width: 5px; height: 5px; }
   .environment-copy small { font-size: 9px; }
   .environment-copy strong { font-size: 9px; }
 }
@@ -3505,30 +3583,6 @@ body[data-environment="coast"] .radio-console {
   border: 0 !important;
 }
 
-.chai-hotspot::before {
-  content: "chai pe chat";
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 10px);
-  padding: 5px 8px;
-  border: 1px solid rgba(255, 219, 167, .15);
-  border-radius: 999px;
-  background: rgba(9, 11, 11, .52);
-  color: rgba(255, 230, 191, .72);
-  font: 700 7px/1 Inter, ui-sans-serif, sans-serif;
-  letter-spacing: .13em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translate(-50%, 4px);
-  transition: opacity .35s ease, transform .35s ease;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.entered .chai-hotspot:hover::before,
-.entered .chai-hotspot:focus-visible::before { opacity: 1; transform: translate(-50%, 0); }
-
 .chat-drawer {
   position: absolute;
   z-index: 32;
@@ -3749,9 +3803,6 @@ body[data-environment="coast"] .radio-console {
 
 .chat-open .radio-console { right: min(466px, 34vw); }
 .chat-open.ui-idle .radio-console { opacity: .7; }
-.chat-launch { margin-left: auto; font-size: 12px; }
-.chat-launch + #playlistButton { margin-left: 0; }
-
 .chat-drawer button:focus-visible,
 .chat-drawer input:focus-visible,
 .chat-drawer textarea:focus-visible,
@@ -3762,7 +3813,6 @@ body[data-environment="coast"] .radio-console {
 }
 
 @media (max-width: 760px) {
-  .entered .chai-hotspot::before { opacity: .72; transform: translate(-50%, 0); }
   .chat-drawer {
     top: max(8px, env(safe-area-inset-top));
     right: 8px;
