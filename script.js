@@ -197,19 +197,19 @@
     drawerTitle: $("#drawerTitle"),
     closePlaylist: $("#closePlaylist"),
     playlist: $("#playlist"),
+    languageFilters: $("#languageFilters"),
     moodFilters: $("#moodFilters"),
-    decadeFilters: $("#decadeFilters"),
     share: $("#shareButton"),
     fullscreen: $("#fullscreenButton"),
     toast: $("#toast")
   };
 
   const saved = readPreferences();
+  const availableLanguages = new Set(["all", "hindi", "kannada"]);
   const availableMoods = new Set([
     "all",
     ...playlist.flatMap((track) => Array.isArray(track.moods) ? track.moods : [track.mood]).filter(Boolean)
   ]);
-  const availableDecades = new Set(["all", ...playlist.map((track) => track.decade).filter(Boolean)]);
   const state = {
     entered: false,
     entryStarted: false,
@@ -217,8 +217,8 @@
     isPlaying: false,
     playIntent: false,
     currentTrackIndex: Math.min(saved.currentTrack || 0, Math.max(playlist.length - 1, 0)),
+    selectedLanguage: availableLanguages.has(saved.selectedLanguage) ? saved.selectedLanguage : "all",
     selectedMood: availableMoods.has(saved.selectedMood) ? saved.selectedMood : "all",
-    selectedDecade: availableDecades.has(saved.selectedDecade) ? saved.selectedDecade : "all",
     recentHistory: [],
     environment: Object.hasOwn(ENVIRONMENTS, saved.environment) ? saved.environment : "monsoon",
     environmentTransitioning: false,
@@ -1739,8 +1739,8 @@
       localStorage.setItem("cbg-preferences", JSON.stringify({
         audioMixVersion: AUDIO_MIX_VERSION,
         currentTrack: state.currentTrackIndex,
+        selectedLanguage: state.selectedLanguage,
         selectedMood: state.selectedMood,
-        selectedDecade: state.selectedDecade,
         environment: state.environment,
         rainMode: state.rainMode,
         rainVolume: state.rainVolume,
@@ -1785,7 +1785,7 @@
     els.shuffle.setAttribute("aria-label", shuffleLabel);
     els.shuffle.title = state.shuffleEnabled ? `${shuffleLabel} on` : shuffleLabel;
     els.share.textContent = config.shareLabel;
-    els.drawerKicker.textContent = `${playlist.length} GAANE · ${config.drawerKicker}`;
+    els.drawerKicker.textContent = `${filteredIndices().length} GAANE · ${config.drawerKicker}`;
     els.drawerTitle.textContent = config.drawerTitle;
     updateTrackUI({ preserveProgress: true });
     updateClock();
@@ -1832,6 +1832,11 @@
     }, delay);
   }
 
+  function trackMatchesLanguage(track, language) {
+    if (!language || language === "all") return true;
+    return (track.language || "hindi").toLowerCase() === language.toLowerCase();
+  }
+
   // Support both current moods[] entries and legacy mood strings.
   function trackMatchesMood(track, mood) {
     if (mood === "all") return true;
@@ -1839,15 +1844,13 @@
     return track.mood === mood;
   }
 
-  function trackMatchesDecade(track, decade) {
-    if (decade === "all") return true;
-    return track.decade === decade;
-  }
-
   function filteredIndices() {
     return playlist
       .map((track, index) => ({ track, index }))
-      .filter(({ track }) => trackMatchesMood(track, state.selectedMood) && trackMatchesDecade(track, state.selectedDecade))
+      .filter(({ track }) => (
+        trackMatchesLanguage(track, state.selectedLanguage) &&
+        trackMatchesMood(track, state.selectedMood)
+      ))
       .map(({ index }) => index);
   }
 
@@ -1876,8 +1879,12 @@
 
   function renderPlaylist() {
     const indices = filteredIndices();
+    const config = ENVIRONMENTS[state.environment] || ENVIRONMENTS.monsoon;
+    if (els.drawerKicker) {
+      els.drawerKicker.textContent = `${indices.length} GAANE · ${config.drawerKicker}`;
+    }
     if (!indices.length) {
-      els.playlist.innerHTML = '<li class="playlist-empty">Is mood aur era mein abhi koi gaana nahi.</li>';
+      els.playlist.innerHTML = '<li class="playlist-empty">Is filter combination mein abhi koi gaana nahi.</li>';
       return;
     }
     els.playlist.innerHTML = indices.map((index, listIndex) => {
@@ -3062,24 +3069,26 @@
       closePlaylist();
     });
 
+    if (els.languageFilters) {
+      els.languageFilters.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-language]");
+        if (!button) return;
+        state.selectedLanguage = button.dataset.language;
+        $$("button", els.languageFilters).forEach((item) => item.classList.toggle("active", item === button));
+        if (state.shuffleEnabled) {
+          state.shuffleBackStack = [];
+          rebuildShuffleQueue();
+        }
+        renderPlaylist();
+        savePreferences();
+      });
+    }
+
     els.moodFilters.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-mood]");
       if (!button) return;
       state.selectedMood = button.dataset.mood;
       $$("button", els.moodFilters).forEach((item) => item.classList.toggle("active", item === button));
-      if (state.shuffleEnabled) {
-        state.shuffleBackStack = [];
-        rebuildShuffleQueue();
-      }
-      renderPlaylist();
-      savePreferences();
-    });
-
-    els.decadeFilters.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-decade]");
-      if (!button) return;
-      state.selectedDecade = button.dataset.decade;
-      $$("button", els.decadeFilters).forEach((item) => item.classList.toggle("active", item === button));
       if (state.shuffleEnabled) {
         state.shuffleBackStack = [];
         rebuildShuffleQueue();
@@ -3173,8 +3182,10 @@
     document.body.dataset.rainMode = state.rainMode;
     applyEnvironmentUi(state.environment);
     $$("[data-rain]").forEach((button) => button.classList.toggle("active", button.dataset.rain === state.rainMode));
+    if (els.languageFilters) {
+      $$("[data-language]", els.languageFilters).forEach((button) => button.classList.toggle("active", button.dataset.language === state.selectedLanguage));
+    }
     $$("[data-mood]", els.moodFilters).forEach((button) => button.classList.toggle("active", button.dataset.mood === state.selectedMood));
-    $$("[data-decade]", els.decadeFilters).forEach((button) => button.classList.toggle("active", button.dataset.decade === state.selectedDecade));
     updateClock();
     setInterval(updateClock, 60000);
     renderPlaylist();

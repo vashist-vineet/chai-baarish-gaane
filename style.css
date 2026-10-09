@@ -748,19 +748,22 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
 
 .mood-filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 5px;
-  overflow-x: auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow: visible;
   margin: 19px 0 12px;
-  padding: 0 8px 18px 0;
-  scrollbar-width: none;
+  padding: 0;
 }
 
-.mood-filters::-webkit-scrollbar { display: none; }
-.mood-filters button { flex: 0 0 auto; padding: 7px 9px; border: 1px solid rgba(255,255,255,.08); }
+.mood-filters button { flex: 0 0 auto; min-height: 30px; height: auto; padding: 7px 9px; border: 1px solid rgba(255,255,255,.08); }
 
-/* Decade filter row — inherits .mood-filters layout, distinct active colour */
-.decade-filters { margin-top: -8px; margin-bottom: 16px; }
-.decade-filters button.active { background: rgba(255, 196, 100, 0.12); color: #ffc464; border-color: rgba(255, 196, 100, 0.35); }
+/* Language filter row — inherits .mood-filters layout */
+.language-filters { margin-top: 14px; margin-bottom: 8px; }
+.language-filters button.active { background: rgba(0, 217, 255, 0.12); color: #00d9ff; border-color: rgba(0, 217, 255, 0.35); }
+
+#moodFilters { margin-top: 0; margin-bottom: 14px; }
 
 .playlist {
   min-height: 0;
@@ -1593,6 +1596,20 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
     width: calc(100vw - 20px);
     padding: 20px 9px 10px 18px;
   }
+  .mood-filters {
+    flex-wrap: nowrap;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 14px 8px 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,.2) transparent;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mood-filters::-webkit-scrollbar { display: block; height: 3px; }
+  .mood-filters::-webkit-scrollbar-track { background: transparent; }
+  .mood-filters::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(255,255,255,.2); }
 }
 
 @media (max-height: 710px) {

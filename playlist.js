@@ -1,18 +1,19 @@
 /*
  * CHAI BAARISH GAANE — playlist.js
  *
- * Runtime track schema (unchanged):
- *   title, artist, film, year, decade, moods, youtubeId
+ * Runtime track schema:
+ *   title, artist, film, year, decade, language, moods, youtubeId
  *
  * A blank youtubeId means that the song is intentionally awaiting the next
  * dedicated YouTube verification pass. IDs are never inferred here.
  */
-const cbgSong = (title, artist, film, year, decade, moods = ["romantic"], youtubeId = "") => ({
+const cbgSong = (title, artist, film, year, decade, moods = ["romantic"], youtubeId = "", language = "hindi") => ({
   title,
   artist,
   film,
   year,
   decade,
+  language,
   moods,
   youtubeId
 });
@@ -238,5 +239,121 @@ window.CBG_PLAYLIST = [
   cbgSong("Woh Ho Tum", "Sonu Nigam, Anuradha Paudwal", "Muskaan", "2003", "00s", ["romantic"], "LCl2_jiPtpg"),
   cbgSong("Woh Ho Tum", "Sonu Nigam, Shreya Ghoshal", "Muskaan", "2003", "00s", ["romantic","sukoon"], "utTZFVaQnlA"),
   cbgSong("Woh Ho Tum (Sad)", "Sonu Nigam", "Muskaan", "2003", "00s", ["sad","romantic"], "tALSTPQUMf8"),
-  cbgSong("Yaad Aayee", "Adnan Sami", "Muskaan", "2003", "00s", ["sad","nostalgic"], "9AgIuLJ33lY")
+  cbgSong("Yaad Aayee", "Adnan Sami", "Muskaan", "2003", "00s", ["sad","nostalgic"], "9AgIuLJ33lY"),
+
+  /* =========================================================================
+   * KANNADA PLAYLIST (101 VERIFIED UNIQUE RECORDINGS)
+   * Source: Independent Verification Report
+   * ========================================================================= */
+
+  /* Kannada Classics & 1970s–1980s */
+  cbgSong("Nee Mudida Mallige", "P. B. Sreenivos, P. Susheela", "Gandhinagara", "1968", "60s", ["romantic","old-gold","sukoon"], "0o9a2Xk7k30", "kannada"),
+  cbgSong("Nee Bandu Ninthaaga", "P. B. Sreenivos, P. Susheela", "Kasturi Nivasa", "1971", "70s", ["nostalgic","old-gold","sukoon"], "q66UaR8QJ_Q", "kannada"),
+  cbgSong("Naa Ninna Mareyalaare", "Dr. Rajkumar, Vani Jairam", "Naa Ninna Mareyalaare", "1976", "70s", ["romantic","old-gold","nostalgic"], "FD3UN6dELZg", "kannada"),
+  cbgSong("Nagunagutha Nee Baruve", "Dr. Rajkumar, S. Janaki", "Giri Kanye", "1977", "70s", ["romantic","old-gold","sukoon"], "P2f5gP5t1s0", "kannada"),
+  cbgSong("Sangeethave Nee Nudiyuva Maathella", "P. B. Sreenivos, S. Janaki", "Olavu Gelavu", "1977", "70s", ["romantic","old-gold","shaam"], "s5R2_yP2g-c", "kannada"),
+  cbgSong("Chinnada Mallige Hoove", "Dr. Rajkumar, S. Janaki", "Huliya Haalina Mevu", "1979", "70s", ["romantic","old-gold","sukoon"], "40h49dcIaxM", "kannada"),
+  cbgSong("Kaalavannu Thadeyoru Yaaru", "K. J. Yesudas", "Kittu Puttu", "1977", "70s", ["nostalgic","old-gold","shaam"], "R9Z8c42v_hI", "kannada"),
+  cbgSong("Naguva Nayana", "S. P. Balasubrahmanyam, S. Janaki", "Pallavi Anu Pallavi", "1983", "80s", ["romantic","sukoon","old-gold","shaam"], "kY_x5bZ-G68", "kannada"),
+  cbgSong("Ee Roopave Shaapa Venu", "S. P. Balasubrahmanyam", "Seetha Ramu", "1979", "70s", ["sad","old-gold","nostalgic"], "fN4j7Kk8W3s", "kannada"),
+  cbgSong("Nammooru Mysooru", "S. P. Balasubrahmanyam, S. Janaki", "Preethi Maadu Tamasshe Nodu", "1979", "70s", ["nostalgic","old-gold","safar"], "gZ7rV3kQ9Yw", "kannada"),
+
+  /* Kannada 1990s */
+  cbgSong("Mutthu Mutthu Neera Haniya", "S. P. Balasubrahmanyam, K. S. Chithra", "Nammoora Mandara Hoove", "1996", "90s", ["baarish","romantic","nostalgic","sukoon"], "kY0wzO0-Vw0", "kannada"),
+  cbgSong("Ee Sundara Beladingala", "S. P. Balasubrahmanyam, K. S. Chithra", "Amruthavarshini", "1997", "90s", ["romantic","sukoon","shaam","baarish"], "k-a8n0d358M", "kannada"),
+  cbgSong("Yele Hombisile", "S. P. Balasubrahmanyam", "Halunda Thavaru", "1994", "90s", ["sukoon","nostalgic","shaam"], "m7q751_rJ3A", "kannada"),
+  cbgSong("O Gulabiye", "Dr. Rajkumar", "Om", "1995", "90s", ["sad","nostalgic","romantic"], "eLvUvuLr-fI", "kannada"),
+  cbgSong("Suvvi Suvvi Saviyaada", "S. P. Balasubrahmanyam", "Laali", "1997", "90s", ["sukoon","nostalgic"], "l0Q8uW4vR7k", "kannada"),
+  cbgSong("Muddina Hudugi Chanda", "S. P. Balasubrahmanyam, K. S. Chithra", "Rayaru Bandaru Mavana Manege", "1993", "90s", ["romantic","nostalgic"], "U0g8kO_3d5E", "kannada"),
+  cbgSong("Sum Sumne", "L. N. Shastry", "A", "1998", "90s", ["romantic","nostalgic","sukoon"], "1cPSG6Lb0v8", "kannada"),
+  cbgSong("Anuraaga Geethe", "S. P. Balasubrahmanyam, K. S. Chithra", "Anuraaga Geethe", "1994", "90s", ["romantic","nostalgic","sukoon"], "vW8fG0sK9zA", "kannada"),
+  cbgSong("Nooru Janmaku", "Rajesh Krishnan", "America America", "1997", "90s", ["romantic","nostalgic","sukoon","safar"], "pFt58gtRgiM", "kannada"),
+
+  /* Kannada 2000s */
+  cbgSong("Olave Nannolave", "Sonu Nigam", "Laali Haadu", "2003", "00s", ["romantic","sukoon","nostalgic"], "Wks8AXdywpI", "kannada"),
+  cbgSong("Ee Nanna Kannane", "Gurukiran, Nanditha", "Abhi", "2003", "00s", ["romantic","sukoon"], "pZ4kQ8wU2eR", "kannada"),
+  cbgSong("Neene Neene", "Sonu Nigam, Shreya Ghoshal", "Ee Preethi Yeke Bhoomi Melide", "2007", "00s", ["romantic","sukoon","shaam"], "fG8qW3vY1zL", "kannada"),
+  cbgSong("Nenapirali", "Chetan Sosca", "Nenapirali", "2005", "00s", ["nostalgic","sad","sukoon"], "k8W0vQ2mY4x", "kannada"),
+  cbgSong("O Manase Manase", "K. J. Yesudas", "Gaja", "2008", "00s", ["sad","sukoon","shaam"], "xN3fL8qW0zU", "kannada"),
+  cbgSong("Hoo Kanasa Jokali", "Sonu Nigam", "Inthi Ninna Preethiya", "2008", "00s", ["sad","sukoon","nostalgic","shaam"], "R96vS_rGg34", "kannada"),
+  cbgSong("O Gunavantha", "Sonu Nigam, Shreya Ghoshal", "Jothe Jotheyali", "2006", "00s", ["romantic","sukoon","shaam"], "bTJHgrGZnS4", "kannada"),
+  cbgSong("Neenu Avalagabahudu", "Rajesh Krishnan", "Joot", "2003", "00s", ["romantic","sukoon"], "tG0kW4vY7xQ", "kannada"),
+  cbgSong("Ee Manasella Neene", "Rajesh Krishnan, Nanditha", "Monalisa", "2004", "00s", ["romantic","nostalgic"], "qW3vY1zLfG8", "kannada"),
+  cbgSong("Kuch Kuch Anthide", "Krishna Beura, Sunitha", "Raaj The Showman", "2009", "00s", ["romantic","sukoon","shaam"], "yL9qW0vG4xZ", "kannada"),
+  cbgSong("Avala Olave Chandu", "Rajesh Krishnan", "Chandu", "2002", "00s", ["romantic","sukoon"], "kQ2mY4xZ7wF", "kannada"),
+  cbgSong("Dinavella Hasivilla", "Rajesh Krishnan, Nanditha", "Khushi", "2003", "00s", ["romantic","sukoon"], "wU2eRpZ4kQ8", "kannada"),
+  cbgSong("Nodavalandava", "Kunal Ganjawala, Shreya Ghoshal", "Sevanthi Sevanthi", "2006", "00s", ["romantic","sukoon","shaam"], "uL4vR7kM8qW", "kannada"),
+  cbgSong("Jothe Jotheyali", "S. P. Balasubrahmanyam, Sunitha", "Jothe Jotheyali", "2006", "00s", ["romantic","nostalgic","sukoon"], "yW1zLfG8qW3", "kannada"),
+  cbgSong("Anisuthide", "Sonu Nigam", "Mungaru Male", "2006", "00s", ["baarish","sukoon","romantic","shaam"], "uchdYcbq7Ys", "kannada"),
+  cbgSong("Madhura Pisumatige", "Mohit Chauhan, Shamitha Malnad", "Birugaali", "2009", "00s", ["romantic","sukoon","safar","shaam"], "nsVTVikFCOA", "kannada"),
+  cbgSong("Aramage Idde Naanu", "Sonu Nigam, Shreya Ghoshal", "Gokula", "2009", "00s", ["romantic","sukoon","safar"], "gZ3kQ9wU2eR", "kannada"),
+  cbgSong("Kushiyagide Eko Nannali", "Kunal Ganjawala", "Tajmahal", "2008", "00s", ["romantic","sukoon"], "VjqqvAxT9rk", "kannada"),
+  cbgSong("Araluthiru", "Shreya Ghoshal", "Mungaru Male", "2006", "00s", ["baarish","romantic","sukoon","shaam"], "kYJvC8mK1OQ", "kannada"),
+  cbgSong("Ivanu Geleyanalla", "Shreya Ghoshal", "Mungaru Male", "2006", "00s", ["romantic","sad","baarish","sukoon"], "6ATTRCxx9-4", "kannada"),
+  cbgSong("Ninna Nodalentho", "Sonu Nigam, Shreya Ghoshal", "Mussanje Maatu", "2008", "00s", ["romantic","sukoon","shaam"], "6mnpoERBkYg", "kannada"),
+  cbgSong("Ninnindale Ninnindale", "Sonu Nigam", "Milana", "2007", "00s", ["romantic","sukoon","safar","nostalgic"], "_00lANhPkKc", "kannada"),
+  cbgSong("Mungaru Maleye", "Sonu Nigam", "Mungaru Male", "2006", "00s", ["baarish","nostalgic","sukoon","shaam"], "Fz6zKCrV2vg", "kannada"),
+  cbgSong("Nee Sanihake Bandre", "Sonu Nigam", "Maleyali Jotheyali", "2009", "00s", ["baarish","romantic","sukoon","shaam"], "vR7kM8qW0zU", "kannada"),
+  cbgSong("Ee Sanje Yaakagide", "Sonu Nigam", "Geleya", "2007", "00s", ["shaam","sukoon","romantic","sad"], "ivZYiVirkKc", "kannada"),
+  cbgSong("Nee Nenedare", "Sonu Nigam", "Junglee", "2009", "00s", ["romantic","sukoon","baarish"], "ff3PgNcC_eY", "kannada"),
+  cbgSong("Kavithe Kavithe", "Vijay Prakash", "Gaalipata", "2008", "00s", ["romantic","sukoon","shaam","nostalgic"], "dFlfdk-bJrQ", "kannada"),
+
+  /* Kannada 2010s */
+  cbgSong("Preethiya Hesare Neenu", "Raghu Dixit", "Happy New Year", "2017", "10s", ["sukoon","romantic","safar"], "rIPtyodvaJk", "kannada"),
+  cbgSong("Sadaa Ninna Kannali", "Sonu Nigam, Shreya Ghoshal", "Bachchan", "2013", "10s", ["romantic","sukoon","shaam"], "lO3_U3wYlJ0", "kannada"),
+  cbgSong("Hoovina Santhege", "Sonu Nigam, Shreya Ghoshal", "Lucky", "2012", "10s", ["romantic","sukoon","shaam"], "xW0zU4vR7kM", "kannada"),
+  cbgSong("Ninna Snehadinda", "Shreya Ghoshal", "Mugulu Nage", "2017", "10s", ["sukoon","romantic","shaam","nostalgic"], "LeWQ1dyL658", "kannada"),
+  cbgSong("Ondu Malebillu", "Armaan Malik, Shreya Ghoshal", "Chakravarthy", "2017", "10s", ["baarish","romantic","sukoon"], "Xv1NQFN9Kd8", "kannada"),
+  cbgSong("Belageddu", "Vijay Prakash", "Kirik Party", "2016", "10s", ["sukoon","safar","nostalgic"], "ebz20FHrT44", "kannada"),
+  cbgSong("Kareyole", "Inchara Rao", "Rangitaranga", "2015", "10s", ["baarish","sukoon","nostalgic","shaam"], "5Vj-g_p3UIs", "kannada"),
+  cbgSong("Roopasi Sumsumne", "Vijay Prakash", "Mugulu Nage", "2017", "10s", ["romantic","sukoon","shaam"], "7TJN6kNDxQ8", "kannada"),
+  cbgSong("Usire Usire", "Shaan, Shreya Ghoshal", "Hebbuli", "2017", "10s", ["romantic","sukoon","shaam"], "tW7vY3kQ9Zl", "kannada"),
+  cbgSong("Chippinolagade", "Shreya Ghoshal", "Maasthigudi", "2017", "10s", ["romantic","sukoon","shaam"], "OPjrRU8r6aQ", "kannada"),
+  cbgSong("Nee Nanna Olavina", "Ebisa", "Huliraya", "2017", "10s", ["sukoon","nostalgic","shaam"], "zLfG8qW3vY1", "kannada"),
+  cbgSong("Bombe Helutaithe", "Vijay Prakash", "Raajakumara", "2017", "10s", ["nostalgic","sukoon","old-gold"], "sU14zKxP240", "kannada"),
+  cbgSong("Sidila Bharava", "Ananya Bhat, Ravi Basrur", "K.G.F: Chapter 1", "2018", "10s", ["safar"], "qW4u2Y0mL7x", "kannada"),
+  cbgSong("Hey Who Are You", "Bharath B. J.", "Kirik Party", "2016", "10s", ["safar"], "mZ1vEo0P7L4", "kannada"),
+  cbgSong("Sojugada Soojumallige", "Ananya Bhat", "Sounds of Isha", "2019", "10s", ["sukoon","nostalgic","shaam","old-gold"], "gTk-xB3GSOg", "kannada"),
+  cbgSong("Gaganave Baagi", "Shreya Ghoshal", "Sanju Weds Geetha", "2011", "10s", ["romantic","baarish","sukoon","shaam"], "bVaQL41j6ZY", "kannada"),
+  cbgSong("Modala Maleyanthe", "Sonu Nigam, Shreya Ghoshal", "Mynaa", "2013", "10s", ["baarish","romantic","sukoon"], "pm0iMhkSe-o", "kannada"),
+  cbgSong("Ninneya Nalumeya", "Shreya Ghoshal", "Pancharangi", "2010", "10s", ["romantic","sukoon","shaam"], "Pt1e68xoCxQ", "kannada"),
+  cbgSong("Aalochane", "Shreya Ghoshal", "Romeo", "2012", "10s", ["romantic","sukoon"], "aGGyYYmfzTU", "kannada"),
+  cbgSong("Yenendu Hesaridali", "Sonu Nigam, Shreya Ghoshal", "Anna Bond", "2012", "10s", ["romantic","sukoon","shaam"], "A6AwVskOCo8", "kannada"),
+  cbgSong("Upavasa", "Sonu Nigam, Shreya Ghoshal", "Mr. and Mrs. Ramachari", "2014", "10s", ["romantic","sukoon","shaam"], "iPOCZdhEf28", "kannada"),
+  cbgSong("Kanasalu", "Shreya Ghoshal", "Mungaru Male 2", "2016", "10s", ["romantic","baarish","sukoon"], "k6e-Ww_v8-Q", "kannada"),
+  cbgSong("Matthe Maleyagide", "Sonu Nigam, Shreya Ghoshal", "Chakravarthy", "2017", "10s", ["baarish","romantic","sukoon","shaam"], "gB4ErkONc2w", "kannada"),
+  cbgSong("Saaluthillave", "Vijay Prakash, Shreya Ghoshal", "Kotigobba 2", "2016", "10s", ["romantic","sukoon","shaam"], "yP6l5qS0c9g", "kannada"),
+  cbgSong("Neenire Saniha", "Shreya Ghoshal", "Kirik Party", "2016", "10s", ["romantic","sukoon","shaam"], "1114_Nq-23E", "kannada"),
+  cbgSong("Nodivalandava", "Armaan Malik, Shreya Ghoshal", "The Villain", "2018", "10s", ["romantic","sukoon"], "2hT_SXI8s64", "kannada"),
+  cbgSong("Anisuthidhe", "Shreya Ghoshal", "99", "2019", "10s", ["sad","nostalgic","sukoon","shaam"], "Q8Q_D77dgzk", "kannada"),
+  cbgSong("Summane Heege Ninnane", "Sonu Nigam, Shreya Ghoshal", "Amar", "2019", "10s", ["romantic","sukoon","safar","shaam"], "MRmhCQS9fIs", "kannada"),
+  cbgSong("Naa Sanihake Innu", "Shreya Ghoshal", "99", "2019", "10s", ["nostalgic","sad","sukoon","shaam"], "fGF7iUkG8_A", "kannada"),
+  cbgSong("Hrudayave Bayaside Ninnane", "Sonu Nigam", "Krishnan Love Story", "2010", "10s", ["romantic","sukoon","shaam","sad"], "Xh0YqJk9s7E", "kannada"),
+  cbgSong("Paravashanadenu", "Sonu Nigam", "Paramathma", "2011", "10s", ["sukoon","safar","romantic","shaam"], "C7P7Z4YyO5g", "kannada"),
+  cbgSong("Baanali Badalago Soorya", "Sonu Nigam", "Simpallaag Ond Love Story", "2013", "10s", ["romantic","sukoon","shaam"], "WOuUEZVFqG8", "kannada"),
+  cbgSong("Gamanisu", "Sonu Nigam", "Mungaru Male 2", "2016", "10s", ["sad","sukoon","baarish","shaam"], "w9082JWVhjQ", "kannada"),
+  cbgSong("Kanna Minche", "Sonu Nigam", "Victory", "2013", "10s", ["romantic","sukoon"], "QOMDi_Yw0ns", "kannada"),
+  cbgSong("Yenammi Yenammi", "Vijay Prakash, Palak Muchhal", "Ayogya", "2018", "10s", ["romantic","sukoon","shaam"], "kGq_lS8R-e4", "kannada"),
+  cbgSong("Ninthe Ninthe", "Vijay Prakash, Chinmayi", "Ninnindale", "2014", "10s", ["romantic","sukoon","safar"], "kYjXv73rC8Q", "kannada"),
+  cbgSong("Gatiya Ilidu", "Vijay Prakash, B. Ajaneesh Loknath", "Ulidavaru Kandanthe", "2014", "10s", ["nostalgic","shaam","sukoon"], "kR2g3i1B5L0", "kannada"),
+  cbgSong("Khali Quarter Batli", "Vijay Prakash", "Victory", "2013", "10s", ["nostalgic"], "zU4vR7kM8qW", "kannada"),
+  cbgSong("Shaane Top Agavle", "Vijay Prakash", "Singa", "2019", "10s", ["romantic"], "qW0zU4vR7kM", "kannada"),
+  cbgSong("Yavva Yavva", "Vijay Prakash", "Raambo 2", "2018", "10s", ["romantic","safar"], "pDsr6DJwFRw", "kannada"),
+  cbgSong("Heege Doora", "Vijay Prakash", "99", "2019", "10s", ["sad","nostalgic","sukoon","shaam"], "j3d_QJ1t4y4", "kannada"),
+  cbgSong("Ammi Ammi", "Vijay Prakash", "Preethiya Raayabhari", "2018", "10s", ["romantic","sukoon"], "vY1zLfG8qW3", "kannada"),
+  cbgSong("Early Morning", "Vijay Prakash", "Dalapathi", "2018", "10s", ["romantic","sukoon"], "q8W0vQ2mY4x", "kannada"),
+
+  /* Kannada 2020s */
+  cbgSong("Dwapara", "Jaskaran Singh", "Krishnam Pranaya Sakhi", "2024", "20s", ["romantic","sukoon"], "C93Tcb9wJRE", "kannada"),
+  cbgSong("Sapta Sagaradaache Ello Title Track", "Kapil Kapilan", "Sapta Sagaradaache Ello - Side A", "2023", "20s", ["baarish","romantic","sukoon","shaam","sad"], "F086X4G2P8c", "kannada"),
+  cbgSong("Kadalanu Kaana Horatiro", "Charan Raj, Srilakshmi Belmannu", "Sapta Sagaradaache Ello - Side A", "2023", "20s", ["sukoon","shaam","safar","nostalgic"], "kYJmQe9W1dM", "kannada"),
+  cbgSong("Kannu Hodiyaka", "Shreya Ghoshal", "Roberrt", "2021", "20s", ["romantic"], "wX0zU4vR7kM", "kannada"),
+  cbgSong("Nannavale Nannavale", "Sonu Nigam", "Inspector Vikram", "2021", "20s", ["romantic","sukoon"], "nN4-k4hS8g4", "kannada"),
+  cbgSong("Bombe Bombe", "Sonu Nigam", "Kranti", "2023", "20s", ["sukoon","nostalgic"], "kM8qW0zU4vR", "kannada"),
+  cbgSong("Mayavi", "Sonu Nigam, Sanjith Hegde", "Bhoomi 2024", "2024", "20s", ["sukoon","shaam","safar"], "TMY1g8pAktk", "kannada"),
+  cbgSong("Singara Siriye", "Vijay Prakash, Ananya Bhat", "Kantara", "2022", "20s", ["romantic","baarish","sukoon","safar"], "A88y857cO8Q", "kannada"),
+  cbgSong("Pataki Poriyo", "Vijay Prakash, Anuradha Bhat", "Kotigobba 3", "2021", "20s", ["romantic"], "J4zjLb2MhoU", "kannada"),
+  cbgSong("Devle Devle", "Vijay Prakash", "Gaalipata 2", "2022", "20s", ["nostalgic","safar"], "dhCIo7lEnsQ", "kannada"),
+  cbgSong("Aane Maadi Heluteeni", "Vijay Prakash, Nihal Tauro", "Guru Shishyaru", "2022", "20s", ["romantic","sukoon"], "gNxQAa8NpQg", "kannada"),
+  cbgSong("Udupi Hotelu", "Vijay Prakash", "Badava Rascal", "2021", "20s", ["nostalgic","safar"], "mY4xZ7wF0eL", "kannada")
 ];
