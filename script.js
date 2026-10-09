@@ -232,6 +232,7 @@
     shuffleBackStack: [],
     playRequestId: 0,
     confirmedPlayingRequestId: 0,
+    failedPlaybackRequestId: 0,
     lastTrackLoadAt: 0,
     lastRequestedVideoId: "",
     lastTrackOrigin: "initial",
@@ -1848,6 +1849,7 @@
     return playlist
       .map((track, index) => ({ track, index }))
       .filter(({ track }) => (
+        hasValidVideoId(track) &&
         trackMatchesLanguage(track, state.selectedLanguage) &&
         trackMatchesMood(track, state.selectedMood)
       ))
@@ -2030,7 +2032,10 @@
     let nextIndex;
     if (state.shuffleEnabled) {
       nextIndex = nextShuffleIndex();
-      if (nextIndex !== null && nextIndex !== state.currentTrackIndex) state.shuffleBackStack.push(state.currentTrackIndex);
+      const activePool = new Set(playableFilteredIndices());
+      if (nextIndex !== null && nextIndex !== state.currentTrackIndex && activePool.has(state.currentTrackIndex)) {
+        state.shuffleBackStack.push(state.currentTrackIndex);
+      }
     } else {
       nextIndex = sequentialFilteredIndex(1);
     }
@@ -2042,7 +2047,13 @@
   function previousTrack() {
     recordSkip();
     let previousIndex = null;
-    if (state.shuffleEnabled && state.shuffleBackStack.length) previousIndex = state.shuffleBackStack.pop();
+    if (state.shuffleEnabled && state.shuffleBackStack.length) {
+      const activePool = new Set(playableFilteredIndices());
+      while (state.shuffleBackStack.length && previousIndex === null) {
+        const candidate = state.shuffleBackStack.pop();
+        if (activePool.has(candidate)) previousIndex = candidate;
+      }
+    }
     if (previousIndex === null) previousIndex = sequentialFilteredIndex(-1);
     if (previousIndex === null) return false;
     return playTrack(previousIndex, { autoplay: true, origin: "previous" });
@@ -2110,6 +2121,7 @@
         player.loadVideoById({ videoId: targetVideoId, startSeconds });
         state.lastPlaybackPosition = startSeconds;
         state.lastPlaybackProgressAt = performance.now();
+        state.lastTrackLoadAt = performance.now();
       }
       player.setVolume(Math.round(state.musicVolume * (musicDucked ? 72 : 100)));
       player.playVideo();
@@ -2143,11 +2155,25 @@
       && now - state.lastPlaybackProgressAt < PLAYBACK_STALL_LIMIT;
     const justStarted = snapshot.playerState === (states.PLAYING ?? 1)
       && now - state.lastPlaybackProgressAt < PLAYBACK_STALL_LIMIT;
-    if (temporarilyLoading || justStarted) {
+    const waitingToStart = [states.UNSTARTED ?? -1, states.PAUSED ?? 2, states.CUED ?? 5].includes(snapshot.playerState)
+      && now - state.lastTrackLoadAt < PLAYBACK_STALL_LIMIT;
+    if (temporarilyLoading || justStarted || waitingToStart) {
       schedulePlaybackWatchdog(1800, requestId);
       return;
     }
     recoverPlayback(requestId);
+  }
+
+  function skipFailedTrack(requestId, failedIndex, message) {
+    if (requestId !== state.playRequestId || failedIndex !== state.currentTrackIndex) return false;
+    if (state.failedPlaybackRequestId === requestId) return false;
+    state.failedPlaybackRequestId = requestId;
+    clearTimeout(playbackWatchdogTimer);
+    setPlaying(false);
+    state.erroredTracks.add(failedIndex);
+    state.shuffleQueue = state.shuffleQueue.filter((index) => index !== failedIndex);
+    showToast(message, 3200);
+    return nextTrack({ autoplay: true, origin: "playback-fallback", countSkip: false });
   }
 
   function recoverPlayback(requestId) {
@@ -2161,12 +2187,8 @@
       return;
     }
 
-    clearTimeout(playbackWatchdogTimer);
     const failedIndex = state.currentTrackIndex;
-    state.erroredTracks.add(failedIndex);
-    state.shuffleQueue = state.shuffleQueue.filter((index) => index !== failedIndex);
-    showToast("Yeh gaana nahi chala. Agla gaana laga rahe hain…", 3200);
-    nextTrack({ autoplay: true, origin: "playback-fallback", countSkip: false });
+    skipFailedTrack(requestId, failedIndex, "Yeh gaana nahi chala. Agla gaana laga rahe hain…");
   }
 
   function togglePlay() {
@@ -2238,11 +2260,7 @@
       if (!reportedId && state.confirmedPlayingRequestId === requestId) return;
       const currentPlayerId = player?.getVideoData?.()?.video_id;
       if (currentPlayerId && currentPlayerId !== expectedId) return;
-      state.erroredTracks.add(failedIndex);
-      state.shuffleQueue = state.shuffleQueue.filter((index) => index !== failedIndex);
-      clearTimeout(playbackWatchdogTimer);
-      showToast("Yeh gaana aaj nahi mila. Cassette aage badh rahi hai…");
-      nextTrack({ autoplay: true, origin: "error", countSkip: false });
+      skipFailedTrack(requestId, failedIndex, "Yeh gaana aaj nahi mila. Cassette aage badh rahi hai…");
     }, delay);
   }
 
