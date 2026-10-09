@@ -199,7 +199,6 @@
     playlist: $("#playlist"),
     languageFilters: $("#languageFilters"),
     moodFilters: $("#moodFilters"),
-    decadeFilters: $("#decadeFilters"),
     share: $("#shareButton"),
     fullscreen: $("#fullscreenButton"),
     toast: $("#toast")
@@ -211,7 +210,6 @@
     "all",
     ...playlist.flatMap((track) => Array.isArray(track.moods) ? track.moods : [track.mood]).filter(Boolean)
   ]);
-  const availableDecades = new Set(["all", ...playlist.map((track) => track.decade).filter(Boolean)]);
   const state = {
     entered: false,
     entryStarted: false,
@@ -221,7 +219,6 @@
     currentTrackIndex: Math.min(saved.currentTrack || 0, Math.max(playlist.length - 1, 0)),
     selectedLanguage: availableLanguages.has(saved.selectedLanguage) ? saved.selectedLanguage : "all",
     selectedMood: availableMoods.has(saved.selectedMood) ? saved.selectedMood : "all",
-    selectedDecade: availableDecades.has(saved.selectedDecade) ? saved.selectedDecade : "all",
     recentHistory: [],
     environment: Object.hasOwn(ENVIRONMENTS, saved.environment) ? saved.environment : "monsoon",
     environmentTransitioning: false,
@@ -1744,7 +1741,6 @@
         currentTrack: state.currentTrackIndex,
         selectedLanguage: state.selectedLanguage,
         selectedMood: state.selectedMood,
-        selectedDecade: state.selectedDecade,
         environment: state.environment,
         rainMode: state.rainMode,
         rainVolume: state.rainVolume,
@@ -1848,20 +1844,12 @@
     return track.mood === mood;
   }
 
-  function trackMatchesDecade(track, decade) {
-    if (decade === "all") return true;
-    if (track.decade === decade) return true;
-    const norm = (d) => (d && (d.startsWith("19") || d.startsWith("20"))) ? d.slice(2) : (d || "");
-    return norm(track.decade) === norm(decade);
-  }
-
   function filteredIndices() {
     return playlist
       .map((track, index) => ({ track, index }))
       .filter(({ track }) => (
         trackMatchesLanguage(track, state.selectedLanguage) &&
-        trackMatchesMood(track, state.selectedMood) &&
-        trackMatchesDecade(track, state.selectedDecade)
+        trackMatchesMood(track, state.selectedMood)
       ))
       .map(({ index }) => index);
   }
@@ -3109,19 +3097,6 @@
       savePreferences();
     });
 
-    els.decadeFilters.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-decade]");
-      if (!button) return;
-      state.selectedDecade = button.dataset.decade;
-      $$("button", els.decadeFilters).forEach((item) => item.classList.toggle("active", item === button));
-      if (state.shuffleEnabled) {
-        state.shuffleBackStack = [];
-        rebuildShuffleQueue();
-      }
-      renderPlaylist();
-      savePreferences();
-    });
-
     $$("[data-rain]").forEach((button) => button.addEventListener("click", () => {
       setWeatherMode(button.dataset.rain, button.dataset.rain !== "storm");
       if (button.dataset.rain === "storm") {
@@ -3211,7 +3186,6 @@
       $$("[data-language]", els.languageFilters).forEach((button) => button.classList.toggle("active", button.dataset.language === state.selectedLanguage));
     }
     $$("[data-mood]", els.moodFilters).forEach((button) => button.classList.toggle("active", button.dataset.mood === state.selectedMood));
-    $$("[data-decade]", els.decadeFilters).forEach((button) => button.classList.toggle("active", button.dataset.decade === state.selectedDecade));
     updateClock();
     setInterval(updateClock, 60000);
     renderPlaylist();
