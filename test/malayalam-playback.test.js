@@ -48,7 +48,7 @@ test("Hindi and Kannada catalogs are byte-for-byte unchanged by Malayalam integr
 
 test("language and mood combinations contain only eligible stable indices", () => {
   const tracks = loadPlaylist();
-  const languages = ["all", "hindi", "kannada", "malayalam", "telugu"];
+  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil"];
   const moods = ["all", ...new Set(tracks.flatMap((track) => track.moods))];
 
   for (const language of languages) {
@@ -70,7 +70,7 @@ test("Malayalam filter is wired through the existing queue and recovery path", (
   const source = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
 
   assert.match(html, /data-language="malayalam"/);
-  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu"\]\)/);
+  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil"\]\)/);
   assert.match(source, /hasValidVideoId\(track\) &&\s*trackMatchesLanguage/);
   assert.match(source, /state\.shuffleBackStack = \[\];\s*rebuildShuffleQueue\(\)/);
   assert.match(source, /function skipFailedTrack\(requestId, failedIndex, message\)/);
