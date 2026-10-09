@@ -758,6 +758,10 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
 .mood-filters::-webkit-scrollbar { display: none; }
 .mood-filters button { flex: 0 0 auto; padding: 7px 9px; border: 1px solid rgba(255,255,255,.08); }
 
+/* Language filter row — inherits .mood-filters layout */
+.language-filters { margin-top: 14px; margin-bottom: -10px; }
+.language-filters button.active { background: rgba(0, 217, 255, 0.12); color: #00d9ff; border-color: rgba(0, 217, 255, 0.35); }
+
 /* Decade filter row — inherits .mood-filters layout, distinct active colour */
 .decade-filters { margin-top: -8px; margin-bottom: 16px; }
 .decade-filters button.active { background: rgba(255, 196, 100, 0.12); color: #ffc464; border-color: rgba(255, 196, 100, 0.35); }

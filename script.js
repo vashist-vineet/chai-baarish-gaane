@@ -197,6 +197,7 @@
     drawerTitle: $("#drawerTitle"),
     closePlaylist: $("#closePlaylist"),
     playlist: $("#playlist"),
+    languageFilters: $("#languageFilters"),
     moodFilters: $("#moodFilters"),
     decadeFilters: $("#decadeFilters"),
     share: $("#shareButton"),
@@ -205,6 +206,7 @@
   };
 
   const saved = readPreferences();
+  const availableLanguages = new Set(["all", "hindi", "kannada"]);
   const availableMoods = new Set([
     "all",
     ...playlist.flatMap((track) => Array.isArray(track.moods) ? track.moods : [track.mood]).filter(Boolean)
@@ -217,6 +219,7 @@
     isPlaying: false,
     playIntent: false,
     currentTrackIndex: Math.min(saved.currentTrack || 0, Math.max(playlist.length - 1, 0)),
+    selectedLanguage: availableLanguages.has(saved.selectedLanguage) ? saved.selectedLanguage : "all",
     selectedMood: availableMoods.has(saved.selectedMood) ? saved.selectedMood : "all",
     selectedDecade: availableDecades.has(saved.selectedDecade) ? saved.selectedDecade : "all",
     recentHistory: [],
@@ -1739,6 +1742,7 @@
       localStorage.setItem("cbg-preferences", JSON.stringify({
         audioMixVersion: AUDIO_MIX_VERSION,
         currentTrack: state.currentTrackIndex,
+        selectedLanguage: state.selectedLanguage,
         selectedMood: state.selectedMood,
         selectedDecade: state.selectedDecade,
         environment: state.environment,
@@ -1785,7 +1789,7 @@
     els.shuffle.setAttribute("aria-label", shuffleLabel);
     els.shuffle.title = state.shuffleEnabled ? `${shuffleLabel} on` : shuffleLabel;
     els.share.textContent = config.shareLabel;
-    els.drawerKicker.textContent = `${playlist.length} GAANE · ${config.drawerKicker}`;
+    els.drawerKicker.textContent = `${filteredIndices().length} GAANE · ${config.drawerKicker}`;
     els.drawerTitle.textContent = config.drawerTitle;
     updateTrackUI({ preserveProgress: true });
     updateClock();
@@ -1832,6 +1836,11 @@
     }, delay);
   }
 
+  function trackMatchesLanguage(track, language) {
+    if (!language || language === "all") return true;
+    return (track.language || "hindi").toLowerCase() === language.toLowerCase();
+  }
+
   // Support both current moods[] entries and legacy mood strings.
   function trackMatchesMood(track, mood) {
     if (mood === "all") return true;
@@ -1841,13 +1850,19 @@
 
   function trackMatchesDecade(track, decade) {
     if (decade === "all") return true;
-    return track.decade === decade;
+    if (track.decade === decade) return true;
+    const norm = (d) => (d && (d.startsWith("19") || d.startsWith("20"))) ? d.slice(2) : (d || "");
+    return norm(track.decade) === norm(decade);
   }
 
   function filteredIndices() {
     return playlist
       .map((track, index) => ({ track, index }))
-      .filter(({ track }) => trackMatchesMood(track, state.selectedMood) && trackMatchesDecade(track, state.selectedDecade))
+      .filter(({ track }) => (
+        trackMatchesLanguage(track, state.selectedLanguage) &&
+        trackMatchesMood(track, state.selectedMood) &&
+        trackMatchesDecade(track, state.selectedDecade)
+      ))
       .map(({ index }) => index);
   }
 
@@ -1876,8 +1891,12 @@
 
   function renderPlaylist() {
     const indices = filteredIndices();
+    const config = ENVIRONMENTS[state.environment] || ENVIRONMENTS.monsoon;
+    if (els.drawerKicker) {
+      els.drawerKicker.textContent = `${indices.length} GAANE · ${config.drawerKicker}`;
+    }
     if (!indices.length) {
-      els.playlist.innerHTML = '<li class="playlist-empty">Is mood aur era mein abhi koi gaana nahi.</li>';
+      els.playlist.innerHTML = '<li class="playlist-empty">Is filter combination mein abhi koi gaana nahi.</li>';
       return;
     }
     els.playlist.innerHTML = indices.map((index, listIndex) => {
@@ -3062,6 +3081,21 @@
       closePlaylist();
     });
 
+    if (els.languageFilters) {
+      els.languageFilters.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-language]");
+        if (!button) return;
+        state.selectedLanguage = button.dataset.language;
+        $$("button", els.languageFilters).forEach((item) => item.classList.toggle("active", item === button));
+        if (state.shuffleEnabled) {
+          state.shuffleBackStack = [];
+          rebuildShuffleQueue();
+        }
+        renderPlaylist();
+        savePreferences();
+      });
+    }
+
     els.moodFilters.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-mood]");
       if (!button) return;
@@ -3173,6 +3207,9 @@
     document.body.dataset.rainMode = state.rainMode;
     applyEnvironmentUi(state.environment);
     $$("[data-rain]").forEach((button) => button.classList.toggle("active", button.dataset.rain === state.rainMode));
+    if (els.languageFilters) {
+      $$("[data-language]", els.languageFilters).forEach((button) => button.classList.toggle("active", button.dataset.language === state.selectedLanguage));
+    }
     $$("[data-mood]", els.moodFilters).forEach((button) => button.classList.toggle("active", button.dataset.mood === state.selectedMood));
     $$("[data-decade]", els.decadeFilters).forEach((button) => button.classList.toggle("active", button.dataset.decade === state.selectedDecade));
     updateClock();
