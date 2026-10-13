@@ -73,7 +73,7 @@ test("Hindi, Kannada, Malayalam, and Telugu catalogs are byte-for-byte unchanged
 
 test("Tamil language and mood pools contain only eligible stable indices", () => {
   const tracks = loadPlaylist();
-  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese"];
+  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati"];
   const moods = ["all", ...new Set(tracks.flatMap((track) => track.moods))];
 
   for (const language of languages) {
@@ -96,9 +96,9 @@ test("Tamil filter uses the existing queue, navigation, and recovery paths", () 
   const source = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
 
   assert.match(html, /data-language="tamil"/);
-  assert.match(html, /playlist\.js\?v=bengali-playlist-20261012-1/);
-  assert.match(html, /script\.js\?v=bengali-language-20261012-1/);
-  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese"\]\)/);
+  assert.match(html, /playlist\.js\?v=gujarati-playlist-20261013-1/);
+  assert.match(html, /script\.js\?v=gujarati-language-20261013-1/);
+  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati"\]\)/);
   assert.match(source, /hasValidVideoId\(track\) &&\s*trackMatchesLanguage/);
   assert.match(source, /state\.shuffleBackStack = \[\];\s*rebuildShuffleQueue\(\)/);
   assert.match(source, /function skipFailedTrack\(requestId, failedIndex, message\)/);
