@@ -38,7 +38,7 @@ test("Bengali runtime catalog contains exactly the audited 75-track set", () => 
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 983);
+  assert.equal(playlist.length, 1061);
   assert.equal(bengali.length, 75);
   assert.equal(bengaliCatalogHash(bengali), EXPECTED_BENGALI_CATALOG_HASH);
   assert.ok(bengali.every((track) => validId(track.youtubeId)));
@@ -78,7 +78,7 @@ test("all five existing language catalogs are byte-for-byte unchanged", () => {
 
 test("Bengali language and mood pools contain only eligible stable indices", () => {
   const tracks = loadPlaylist();
-  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri"];
+  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese"];
   const moods = ["all", ...new Set(tracks.flatMap((track) => track.moods))];
 
   for (const language of languages) {
@@ -103,7 +103,7 @@ test("Bengali filter uses the existing persistence, queue, navigation, and recov
   assert.match(html, /data-language="bengali"/);
   assert.match(html, /playlist\.js\?v=bengali-playlist-20261012-1/);
   assert.match(html, /script\.js\?v=bengali-language-20261012-1/);
-  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri"\]\)/);
+  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese"\]\)/);
   assert.match(source, /availableLanguages\.has\(saved\.selectedLanguage\) \? saved\.selectedLanguage : "all"/);
   assert.match(source, /hasValidVideoId\(track\) &&\s*trackMatchesLanguage/);
   assert.match(source, /state\.shuffleBackStack = \[\];\s*rebuildShuffleQueue\(\)/);
