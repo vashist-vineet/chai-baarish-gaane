@@ -41,7 +41,7 @@ test("Gujarati runtime catalog contains exactly the approved ordered 71-track ma
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 1132);
+  assert.equal(playlist.length, 1165);
   assert.equal(gujarati.length, 71);
   assert.equal(gujaratiCatalogHash(gujarati), EXPECTED_GUJARATI_CORE_HASH);
   assert.equal(catalogHash(gujarati), EXPECTED_GUJARATI_FULL_HASH);
@@ -52,7 +52,7 @@ test("Gujarati runtime catalog contains exactly the approved ordered 71-track ma
   assert.ok(gujarati.every((track) => !otherIds.has(track.youtubeId)));
   assert.equal(new Set(allIds).size, allIds.length);
   assert.equal(new Set(allIdentities).size, allIdentities.length);
-  assert.equal(allIds.length, 1128);
+  assert.equal(allIds.length, 1161);
   assert.deepEqual(
     playlist.filter((track) => !validId(track.youtubeId)).map((track) => track.title),
     ["Tere Naina", "Moh Moh Ke Dhaage", "Resham Si Hain Yeh Hawayein", "Woh Lamhe"]
@@ -84,7 +84,7 @@ test("all eleven pre-Gujarati language catalogs are byte-for-byte unchanged", ()
 
 test("Gujarati language and mood pools contain only eligible stable indices", () => {
   const tracks = loadPlaylist();
-  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati"];
+  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani"];
   const moods = ["all", ...new Set(tracks.flatMap((track) => track.moods))];
 
   for (const language of languages) {
@@ -107,9 +107,9 @@ test("Gujarati selector uses the existing persistence, queue, navigation, and re
   const source = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
 
   assert.match(html, /data-language="gujarati"/);
-  assert.match(html, /playlist\.js\?v=gujarati-playlist-20261013-1/);
-  assert.match(html, /script\.js\?v=gujarati-language-20261013-1/);
-  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati"\]\)/);
+  assert.match(html, /playlist\.js\?v=rajasthani-playlist-20261013-1/);
+  assert.match(html, /script\.js\?v=rajasthani-language-20261013-1/);
+  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani"\]\)/);
   assert.match(source, /availableLanguages\.has\(saved\.selectedLanguage\) \? saved\.selectedLanguage : "all"/);
   assert.match(source, /hasValidVideoId\(track\) &&\s*trackMatchesLanguage/);
   assert.match(source, /state\.shuffleBackStack = \[\];\s*rebuildShuffleQueue\(\)/);

@@ -39,7 +39,7 @@ test("Odia runtime catalog contains exactly the audited 93-track set", () => {
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 1132);
+  assert.equal(playlist.length, 1165);
   assert.equal(odia.length, 93);
   assert.equal(odiaCatalogHash(odia), EXPECTED_ODIA_CATALOG_HASH);
   assert.ok(odia.every((track) => validId(track.youtubeId)));
@@ -78,7 +78,7 @@ test("all eight existing language catalogs are byte-for-byte unchanged", () => {
 
 test("Odia language and mood pools contain only eligible stable indices", () => {
   const tracks = loadPlaylist();
-  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati"];
+  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani"];
   const moods = ["all", ...new Set(tracks.flatMap((track) => track.moods))];
 
   for (const language of languages) {
@@ -101,7 +101,7 @@ test("Odia filter uses the existing persistence, queue, navigation, and recovery
   const source = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
 
   assert.match(html, /data-language="odia"/);
-  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati"\]\)/);
+  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani"\]\)/);
   assert.match(source, /availableLanguages\.has\(saved\.selectedLanguage\) \? saved\.selectedLanguage : "all"/);
   assert.match(source, /hasValidVideoId\(track\) &&\s*trackMatchesLanguage/);
   assert.match(source, /state\.shuffleBackStack = \[\];\s*rebuildShuffleQueue\(\)/);

@@ -39,7 +39,7 @@ test("Marathi runtime catalog contains exactly the audited 80-track set", () => 
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 1132);
+  assert.equal(playlist.length, 1165);
   assert.equal(marathi.length, 80);
   assert.equal(marathiCatalogHash(marathi), EXPECTED_MARATHI_CATALOG_HASH);
   assert.ok(marathi.every((track) => validId(track.youtubeId)));
@@ -77,7 +77,7 @@ test("all six existing language catalogs are byte-for-byte unchanged", () => {
 
 test("Marathi language and mood pools contain only eligible stable indices", () => {
   const tracks = loadPlaylist();
-  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati"];
+  const languages = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani"];
   const moods = ["all", ...new Set(tracks.flatMap((track) => track.moods))];
 
   for (const language of languages) {
@@ -100,7 +100,7 @@ test("Marathi filter uses the existing persistence, queue, navigation, and recov
   const source = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
 
   assert.match(html, /data-language="marathi"/);
-  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati"\]\)/);
+  assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani"\]\)/);
   assert.match(source, /availableLanguages\.has\(saved\.selectedLanguage\) \? saved\.selectedLanguage : "all"/);
   assert.match(source, /hasValidVideoId\(track\) &&\s*trackMatchesLanguage/);
   assert.match(source, /state\.shuffleBackStack = \[\];\s*rebuildShuffleQueue\(\)/);
