@@ -205,7 +205,7 @@
   };
 
   const saved = readPreferences();
-  const availableLanguages = new Set(["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia"]);
+  const availableLanguages = new Set(["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri"]);
   const availableMoods = new Set([
     "all",
     ...playlist.flatMap((track) => Array.isArray(track.moods) ? track.moods : [track.mood]).filter(Boolean)
