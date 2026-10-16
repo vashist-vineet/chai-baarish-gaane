@@ -62,7 +62,7 @@ test("Bengali runtime catalog contains exactly the audited 75-track set", () => 
 test("all five existing language catalogs are byte-for-byte unchanged", () => {
   const playlist = loadPlaylist();
   const expected = {
-    hindi: [202, "70076151346d7fa1a3ee3fc29deffb0b6c151024d68083d4fed9f88988a48d75"],
+    hindi: [202, "eb308a06c5a550912a1d77cbe521ffa8069d7fa6d8d3d1f4dd54973baf2e5811"],
     kannada: [80, "6c36fb2babaafb11a7f901ae949f683cfb21531161c1326a2ef3a58126be824a"],
     malayalam: [71, "f2cffa0825d2f672e818d835275aabf83bdab2c273639ae68db40b34877cd3a8"],
     telugu: [71, "29b75f488bbc25d4c8d2f15478f9577ea7ca82827e5a44b69fe1113a7c22a5b8"],
@@ -101,11 +101,12 @@ test("Bengali filter uses the existing persistence, queue, navigation, and recov
   const source = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
 
   assert.match(html, /data-language="bengali"/);
-  assert.match(html, /playlist\.js\?v=rajasthani-playlist-20261013-1/);
-  assert.match(html, /script\.js\?v=rajasthani-language-20261013-1/);
+  assert.match(html, /playlist\.js\?v=hindi-catalog-20261016-5/);
+  assert.match(html, /hindi-playback-eligibility\.js\?v=verified-hindi-20261016-1/);
+  assert.match(html, /script\.js\?v=verified-hindi-20261016-1/);
   assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani"\]\)/);
   assert.match(source, /availableLanguages\.has\(saved\.selectedLanguage\) \? saved\.selectedLanguage : "all"/);
-  assert.match(source, /hasValidVideoId\(track\) &&\s*trackMatchesLanguage/);
+  assert.match(source, /function filteredIndices\(\) \{\s*return eligibleTrackIndices/);
   assert.match(source, /state\.shuffleBackStack = \[\];\s*rebuildShuffleQueue\(\)/);
   assert.match(source, /function sequentialFilteredIndex/);
   assert.match(source, /function skipFailedTrack\(requestId, failedIndex, message\)/);

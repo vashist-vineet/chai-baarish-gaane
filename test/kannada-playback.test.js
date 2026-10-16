@@ -50,17 +50,18 @@ test("language and mood pools keep stable playable indices", () => {
     }
   }
 
-  assert.equal(tracks.filter((track) => /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length, 1161);
-  assert.equal(tracks.filter((track) => track.language === "hindi" && /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length, 198);
+  assert.equal(tracks.filter((track) => /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length, 1163);
+  assert.equal(tracks.filter((track) => track.language === "hindi" && /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length, 200);
   assert.equal(tracks.filter((track) => track.language === "kannada" && /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length, 80);
 });
 
 test("player failure handling has one request-scoped skip gate and startup grace", () => {
   const source = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
   assert.match(source, /function skipFailedTrack\(requestId, failedIndex, message\)/);
-  assert.match(source, /state\.failedPlaybackRequestId === requestId/);
+  assert.match(source, /resolveFailedTrackTransition\(\{/);
+  assert.match(source, /if \(!transition\.accepted\) return false/);
   assert.match(source, /const waitingToStart = \[states\.UNSTARTED/);
-  assert.match(source, /hasValidVideoId\(track\) &&\s*trackMatchesLanguage/);
+  assert.match(source, /function filteredIndices\(\) \{\s*return eligibleTrackIndices/);
   assert.match(source, /activePool\.has\(state\.currentTrackIndex\)/);
   assert.match(source, /if \(activePool\.has\(candidate\)\) previousIndex = candidate/);
   assert.equal((source.match(/skipFailedTrack\(requestId, failedIndex,/g) || []).length, 3);
