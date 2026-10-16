@@ -2,6 +2,7 @@
   "use strict";
 
   const playlist = window.CBG_PLAYLIST || [];
+  const playbackEligibilityApi = window.CBG_PLAYBACK_ELIGIBILITY;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
@@ -31,7 +32,7 @@
       next: "winter",
       pickLabel: "baarish",
       shuffleLabel: "Monsoon shuffle",
-      shareLabel: "share this baarish ☕",
+      shareLabel: "Share this moment",
       placeLabel: "VERANDA",
       toast: "Phir se baarish.",
       modeToasts: Object.freeze({ light: "Halki si baarish.", medium: "Theek-thaak monsoon.", heavy: "Baarish rukne wali nahi.", storm: "Chhatri se kuch nahi hoga." }),
@@ -52,7 +53,7 @@
       next: "spring",
       pickLabel: "sardi",
       shuffleLabel: "Sardi shuffle",
-      shareLabel: "share this sardi ☕",
+      shareLabel: "Share this moment",
       placeLabel: "SARDI / PAHAAD",
       toast: "Sweater le aana chahiye tha.",
       modeToasts: Object.freeze({ light: "Bas halki si baraf.", medium: "Baraf tikne lagi.", heavy: "Raat bhar giregi.", storm: "Hawa tez ho gayi." }),
@@ -73,7 +74,7 @@
       next: "autumn",
       pickLabel: "bahar",
       shuffleLabel: "Bahar shuffle",
-      shareLabel: "share this bahar ☕",
+      shareLabel: "Share this moment",
       placeLabel: "BAHAR / PAHAAD",
       toast: "Bahar aa gayi.",
       modeToasts: Object.freeze({ light: "Hawa bilkul halki.", medium: "Naram si hawa.", heavy: "Phool hilne lage.", storm: "Hawa mein kuch toh hai." }),
@@ -94,7 +95,7 @@
       next: "desert",
       pickLabel: "patjhad",
       shuffleLabel: "Patjhad shuffle",
-      shareLabel: "share this patjhad ☕",
+      shareLabel: "Share this moment",
       placeLabel: "PATJHAD / PAHAAD",
       toast: "Patjhad aa gaya.",
       modeToasts: Object.freeze({ light: "Hawa ruk gayi.", medium: "Pattey hilne lage.", heavy: "Hawa chal padi.", storm: "Aaj tez hawa hai." }),
@@ -115,7 +116,7 @@
       next: "coast",
       pickLabel: "registan",
       shuffleLabel: "Registan shuffle",
-      shareLabel: "share this registan ☕",
+      shareLabel: "Share this moment",
       placeLabel: "REGISTAN / RAJASTHAN",
       toast: "Registan aa gaya.",
       modeToasts: Object.freeze({ light: "Hawa tham gayi.", medium: "Halki si sookhi hawa.", heavy: "Ret sarakne lagi.", storm: "Ret udne lagi." }),
@@ -136,7 +137,7 @@
       next: "monsoon",
       pickLabel: "samundar",
       shuffleLabel: "Samundar shuffle",
-      shareLabel: "share this samundar ☕",
+      shareLabel: "Share this moment",
       placeLabel: "SAMUNDAR / KINARA",
       toast: "Samundar aa gaya.",
       modeToasts: Object.freeze({ light: "Samundar bilkul shaant.", medium: "Lehrein dheere chal rahi hain.", heavy: "Hawa samundar se aa rahi hai.", storm: "Lehrein tez ho gayi." }),
@@ -210,17 +211,34 @@
     "all",
     ...playlist.flatMap((track) => Array.isArray(track.moods) ? track.moods : [track.mood]).filter(Boolean)
   ]);
+  const shareContextApi = window.CBG_SHARE_CONTEXT;
+  const initialContext = shareContextApi?.resolveInitialState({
+    rawContext: shareContextApi.parseShareContext(location.search),
+    saved,
+    environments: Object.keys(ENVIRONMENTS),
+    languages: availableLanguages,
+    moods: availableMoods,
+    tracks: playlist,
+    isTrackEligible: isTrackEligibleForPlayback
+  }) || {
+    isShared: false,
+    environment: Object.hasOwn(ENVIRONMENTS, saved.environment) ? saved.environment : "monsoon",
+    language: availableLanguages.has(saved.selectedLanguage) ? saved.selectedLanguage : "all",
+    mood: availableMoods.has(saved.selectedMood) ? saved.selectedMood : "all",
+    trackIndex: Math.min(saved.currentTrack || 0, Math.max(playlist.length - 1, 0))
+  };
   const state = {
     entered: false,
     entryStarted: false,
     playerReady: false,
     isPlaying: false,
     playIntent: false,
-    currentTrackIndex: Math.min(saved.currentTrack || 0, Math.max(playlist.length - 1, 0)),
-    selectedLanguage: availableLanguages.has(saved.selectedLanguage) ? saved.selectedLanguage : "all",
-    selectedMood: availableMoods.has(saved.selectedMood) ? saved.selectedMood : "all",
+    isSharedContext: initialContext.isShared,
+    currentTrackIndex: initialContext.trackIndex,
+    selectedLanguage: initialContext.language,
+    selectedMood: initialContext.mood,
     recentHistory: [],
-    environment: Object.hasOwn(ENVIRONMENTS, saved.environment) ? saved.environment : "monsoon",
+    environment: initialContext.environment,
     environmentTransitioning: false,
     rainMode: saved.rainMode || "heavy",
     rainVolume: saved.audioMixVersion === AUDIO_MIX_VERSION ? (saved.rainVolume ?? DEFAULTS.rainVolume) : DEFAULTS.rainVolume,
@@ -232,7 +250,7 @@
     shuffleBackStack: [],
     playRequestId: 0,
     confirmedPlayingRequestId: 0,
-    failedPlaybackRequestId: 0,
+    failedPlaybackRequestId: -1,
     lastTrackLoadAt: 0,
     lastRequestedVideoId: "",
     lastTrackOrigin: "initial",
@@ -1785,7 +1803,6 @@
     const shuffleLabel = config.shuffleLabel;
     els.shuffle.setAttribute("aria-label", shuffleLabel);
     els.shuffle.title = state.shuffleEnabled ? `${shuffleLabel} on` : shuffleLabel;
-    els.share.textContent = config.shareLabel;
     els.drawerKicker.textContent = `${filteredIndices().length} GAANE · ${config.drawerKicker}`;
     els.drawerTitle.textContent = config.drawerTitle;
     updateTrackUI({ preserveProgress: true });
@@ -1846,14 +1863,27 @@
   }
 
   function filteredIndices() {
-    return playlist
-      .map((track, index) => ({ track, index }))
-      .filter(({ track }) => (
-        hasValidVideoId(track) &&
-        trackMatchesLanguage(track, state.selectedLanguage) &&
-        trackMatchesMood(track, state.selectedMood)
-      ))
-      .map(({ index }) => index);
+    return eligibleTrackIndices({
+      language: state.selectedLanguage,
+      mood: state.selectedMood
+    });
+  }
+
+  function countEligibleTracks(language, mood) {
+    return eligibleTrackIndices({ language, mood }).length;
+  }
+
+  function updateFilterOptionCounts() {
+    Array.from(els.languageFilters?.options || []).forEach((option) => {
+      option.dataset.label ||= option.textContent.trim();
+      const count = countEligibleTracks(option.value, state.selectedMood);
+      option.textContent = `${option.dataset.label} (${count})`;
+    });
+    Array.from(els.moodFilters?.options || []).forEach((option) => {
+      option.dataset.label ||= option.textContent.trim();
+      const count = countEligibleTracks(state.selectedLanguage, option.value);
+      option.textContent = `${option.dataset.label} (${count})`;
+    });
   }
 
   function currentTrack() {
@@ -1880,6 +1910,7 @@
   }
 
   function renderPlaylist() {
+    updateFilterOptionCounts();
     const indices = filteredIndices();
     const config = ENVIRONMENTS[state.environment] || ENVIRONMENTS.monsoon;
     if (els.drawerKicker) {
@@ -1909,17 +1940,39 @@
     return Boolean(track && typeof track.youtubeId === "string" && /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId));
   }
 
-  function playableIndices({ includeErrored = false } = {}) {
+  function isTrackEligibleForPlayback(track) {
+    if (playbackEligibilityApi?.isTrackEligible) return playbackEligibilityApi.isTrackEligible(track);
+    if (!hasValidVideoId(track)) return false;
+    return (track.language || "hindi").toLowerCase() !== "hindi";
+  }
+
+  function eligibleTrackIndices({ language = "all", mood = "all", excludedIndices = new Set() } = {}) {
+    if (playbackEligibilityApi?.eligibleIndices) {
+      return playbackEligibilityApi.eligibleIndices(playlist, { language, mood, excludedIndices });
+    }
     return playlist
       .map((track, index) => ({ track, index }))
-      .filter(({ track, index }) => hasValidVideoId(track) && (includeErrored || !state.erroredTracks.has(index)))
+      .filter(({ track, index }) => (
+        isTrackEligibleForPlayback(track) &&
+        !excludedIndices.has(index) &&
+        trackMatchesLanguage(track, language) &&
+        trackMatchesMood(track, mood)
+      ))
       .map(({ index }) => index);
   }
 
+  function playableIndices({ includeErrored = false } = {}) {
+    return eligibleTrackIndices({
+      excludedIndices: includeErrored ? new Set() : state.erroredTracks
+    });
+  }
+
   function playableFilteredIndices({ includeErrored = false } = {}) {
-    return filteredIndices().filter((index) => (
-      hasValidVideoId(playlist[index]) && (includeErrored || !state.erroredTracks.has(index))
-    ));
+    return eligibleTrackIndices({
+      language: state.selectedLanguage,
+      mood: state.selectedMood,
+      excludedIndices: includeErrored ? new Set() : state.erroredTracks
+    });
   }
 
   function sequentialFilteredIndex(direction = 1, fromIndex = state.currentTrackIndex) {
@@ -1972,16 +2025,16 @@
     return playableFilteredIndices().includes(state.currentTrackIndex) ? state.currentTrackIndex : null;
   }
 
-  function playTrack(index, { autoplay = true, origin = "unknown" } = {}) {
+  function playTrack(index, { autoplay = true, origin = "unknown", persistSelection = true } = {}) {
     if (!Number.isInteger(index) || index < 0 || index >= playlist.length) return false;
     const track = playlist[index];
     const preserveExactSelection = !state.shuffleEnabled && (origin === "next" || origin === "playlist");
-    if (!hasValidVideoId(track) || (state.erroredTracks.has(index) && !preserveExactSelection)) {
-      if (!hasValidVideoId(track)) console.warn("Skipping track with invalid YouTube ID", { index, title: track?.title });
+    if (!isTrackEligibleForPlayback(track) || (state.erroredTracks.has(index) && !preserveExactSelection)) {
+      if (!isTrackEligibleForPlayback(track)) console.warn("Skipping ineligible track", { index, title: track?.title });
       const filteredFallback = origin === "playlist" ? sequentialFilteredIndex(1, index) : null;
       const fallback = filteredFallback ?? sequentialIndex(1, index);
       if (fallback === null || fallback === index) return false;
-      return playTrack(fallback, { autoplay, origin: "invalid-fallback" });
+      return playTrack(fallback, { autoplay, origin: "invalid-fallback", persistSelection });
     }
 
     const requestId = ++state.playRequestId;
@@ -2004,7 +2057,7 @@
     }
 
     updateTrackUI();
-    savePreferences();
+    if (persistSelection) savePreferences();
 
     if (player && state.playerReady) {
       try {
@@ -2017,7 +2070,10 @@
         setTimeout(() => {
           if (requestId !== state.playRequestId || !player || !state.playerReady) return;
           const activeId = player.getVideoData?.()?.video_id;
-          if (activeId && activeId !== targetVideoId) player.loadVideoById(targetVideoId);
+          if (activeId && activeId !== targetVideoId) {
+            if (autoplay) player.loadVideoById(targetVideoId);
+            else player.cueVideoById(targetVideoId);
+          }
           if (autoplay) player.playVideo();
         }, 420);
       } catch {
@@ -2027,7 +2083,7 @@
     return true;
   }
 
-  function nextTrack({ autoplay = true, origin = "next", countSkip = true } = {}) {
+  function nextTrack({ autoplay = true, origin = "next", countSkip = true, persistSelection = true } = {}) {
     if (countSkip) recordSkip();
     let nextIndex;
     if (state.shuffleEnabled) {
@@ -2041,7 +2097,7 @@
     }
     if (nextIndex === null) return false;
     if (nextIndex === state.currentTrackIndex && playableFilteredIndices().length > 1) return false;
-    return playTrack(nextIndex, { autoplay, origin });
+    return playTrack(nextIndex, { autoplay, origin, persistSelection });
   }
 
   function previousTrack() {
@@ -2166,14 +2222,38 @@
 
   function skipFailedTrack(requestId, failedIndex, message) {
     if (requestId !== state.playRequestId || failedIndex !== state.currentTrackIndex) return false;
-    if (state.failedPlaybackRequestId === requestId) return false;
-    state.failedPlaybackRequestId = requestId;
+    const transition = shareContextApi?.resolveFailedTrackTransition({
+      requestId,
+      failedRequestId: state.failedPlaybackRequestId,
+      isSharedContext: state.isSharedContext,
+      playIntent: state.playIntent
+    }) || {
+      accepted: state.failedPlaybackRequestId !== requestId,
+      failedRequestId: requestId,
+      autoplay: state.playIntent,
+      persistSelection: true
+    };
+    if (!transition.accepted) return false;
+    state.failedPlaybackRequestId = transition.failedRequestId;
     clearTimeout(playbackWatchdogTimer);
     setPlaying(false);
     state.erroredTracks.add(failedIndex);
     state.shuffleQueue = state.shuffleQueue.filter((index) => index !== failedIndex);
     showToast(message, 3200);
-    return nextTrack({ autoplay: true, origin: "playback-fallback", countSkip: false });
+    const advancedWithinFilter = nextTrack({
+      autoplay: transition.autoplay,
+      origin: "playback-fallback",
+      countSkip: false,
+      persistSelection: transition.persistSelection
+    });
+    if (advancedWithinFilter) return true;
+    const globalFallback = sequentialIndex(1, failedIndex);
+    if (globalFallback === null || globalFallback === failedIndex) return false;
+    return playTrack(globalFallback, {
+      autoplay: transition.autoplay,
+      origin: "playback-global-fallback",
+      persistSelection: transition.persistSelection
+    });
   }
 
   function recoverPlayback(requestId) {
@@ -2283,7 +2363,7 @@
   function createPlayer() {
     if (player || !playlist.length) return;
     const vars = {
-      autoplay: 1,
+      autoplay: state.isSharedContext ? 0 : 1,
       controls: 0,
       disablekb: 1,
       fs: 0,
@@ -2301,15 +2381,22 @@
       events: {
         onReady(event) {
           state.playerReady = true;
-          state.playIntent = true;
           state.playbackRecoveryAttempts = 0;
           state.lastPlaybackPosition = 0;
           state.lastPlaybackProgressAt = performance.now();
-          event.target.setVolume(0);
           const targetVideoId = currentTrack().youtubeId;
-          event.target.loadVideoById(targetVideoId);
-          setTimeout(() => rampMusicVolume(state.musicVolume, 1200), 550);
-          schedulePlaybackWatchdog(PLAYBACK_VERIFY_DELAY);
+          if (state.isSharedContext) {
+            state.playIntent = false;
+            event.target.setVolume(Math.round(state.musicVolume * 100));
+            event.target.cueVideoById(targetVideoId);
+            els.tapToPlay.hidden = false;
+          } else {
+            state.playIntent = true;
+            event.target.setVolume(0);
+            event.target.loadVideoById(targetVideoId);
+            setTimeout(() => rampMusicVolume(state.musicVolume, 1200), 550);
+            schedulePlaybackWatchdog(PLAYBACK_VERIFY_DELAY);
+          }
           setTimeout(() => {
             if (!state.isPlaying) els.tapToPlay.hidden = false;
           }, 1700);
@@ -2948,19 +3035,34 @@
       winter: "Found a tiny corner of the internet for chai, baraf and purane gaane. ❄️☕",
       spring: "Found a tiny corner of the internet for chai, bahar and purane gaane. ☕",
       autumn: "Found a tiny corner of the internet for chai, patjhad and purane gaane. 🍂☕",
-      desert: "Found a tiny corner of the internet for chai, registan and purane gaane. ☕"
+      desert: "Found a tiny corner of the internet for chai, registan and purane gaane. ☕",
+      coast: "Found a tiny corner of the internet for chai, samundar and purane gaane. 🌊☕"
     };
+    const track = currentTrack();
+    const shareUrl = shareContextApi?.buildShareUrl(location.href, {
+      environment: state.environment,
+      language: state.selectedLanguage,
+      mood: state.selectedMood,
+      trackId: isTrackEligibleForPlayback(track) ? track.youtubeId : ""
+    }, {
+      environments: Object.keys(ENVIRONMENTS),
+      languages: availableLanguages,
+      moods: availableMoods
+    }) || location.href;
     const data = {
       title: "Chai Baarish Gaane",
-      text: shareCopy[state.environment],
-      url: location.href
+      text: shareCopy[state.environment] || shareCopy.monsoon,
+      url: shareUrl
     };
     try {
       if (navigator.share) await navigator.share(data);
-      else {
-        await navigator.clipboard.writeText(location.href);
-        const label = ENVIRONMENTS[state.environment].pickLabel.replace(/^./, (letter) => letter.toUpperCase());
+      else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+        const envConfig = ENVIRONMENTS[state.environment] || ENVIRONMENTS.monsoon;
+        const label = envConfig.pickLabel.replace(/^./, (letter) => letter.toUpperCase());
         showToast(`${label} ka link copy ho gaya.`);
+      } else {
+        throw new Error("Clipboard API unavailable");
       }
     } catch (error) {
       if (error?.name !== "AbortError") showToast("Link copy nahi hua. Address bar se le lo, dost.");
@@ -3088,11 +3190,10 @@
     });
 
     if (els.languageFilters) {
-      els.languageFilters.addEventListener("click", (event) => {
-        const button = event.target.closest("button[data-language]");
-        if (!button) return;
-        state.selectedLanguage = button.dataset.language;
-        $$("button", els.languageFilters).forEach((item) => item.classList.toggle("active", item === button));
+      els.languageFilters.addEventListener("change", (event) => {
+        const language = event.currentTarget.value;
+        state.selectedLanguage = availableLanguages.has(language) ? language : "all";
+        event.currentTarget.value = state.selectedLanguage;
         if (state.shuffleEnabled) {
           state.shuffleBackStack = [];
           rebuildShuffleQueue();
@@ -3102,11 +3203,10 @@
       });
     }
 
-    els.moodFilters.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-mood]");
-      if (!button) return;
-      state.selectedMood = button.dataset.mood;
-      $$("button", els.moodFilters).forEach((item) => item.classList.toggle("active", item === button));
+    els.moodFilters.addEventListener("change", (event) => {
+      const mood = event.currentTarget.value;
+      state.selectedMood = availableMoods.has(mood) ? mood : "all";
+      event.currentTarget.value = state.selectedMood;
       if (state.shuffleEnabled) {
         state.shuffleBackStack = [];
         rebuildShuffleQueue();
@@ -3163,7 +3263,7 @@
         enterExperience();
         return;
       }
-      if (!state.entered || document.body.classList.contains("chat-open") || ["INPUT", "TEXTAREA", "BUTTON"].includes(document.activeElement?.tagName)) return;
+      if (!state.entered || document.body.classList.contains("chat-open") || ["INPUT", "TEXTAREA", "BUTTON", "SELECT"].includes(document.activeElement?.tagName)) return;
       if (event.code === "Space") { event.preventDefault(); togglePlay(); }
       if (event.key === "ArrowRight") nextTrack();
       if (event.key === "ArrowLeft") previousTrack();
@@ -3189,7 +3289,14 @@
       els.title.textContent = "Baarish only tonight";
       els.artist.textContent = "Playlist could not be loaded";
     }
-    if (!hasValidVideoId(currentTrack())) state.currentTrackIndex = playableIndices({ includeErrored: true })[0] ?? 0;
+    state.currentTrackIndex = playbackEligibilityApi?.resolveEligibleIndex
+      ? playbackEligibilityApi.resolveEligibleIndex(playlist, state.currentTrackIndex, {
+        language: state.selectedLanguage,
+        mood: state.selectedMood
+      })
+      : (isTrackEligibleForPlayback(currentTrack())
+        ? state.currentTrackIndex
+        : (playableFilteredIndices({ includeErrored: true })[0] ?? playableIndices({ includeErrored: true })[0] ?? 0));
     els.rainVolume.value = Math.round(state.rainVolume * 100);
     els.musicVolume.value = Math.round(state.musicVolume * 100);
     els.rainVolume.style.setProperty("--range", `${els.rainVolume.value}%`);
@@ -3200,10 +3307,8 @@
     document.body.dataset.rainMode = state.rainMode;
     applyEnvironmentUi(state.environment);
     $$("[data-rain]").forEach((button) => button.classList.toggle("active", button.dataset.rain === state.rainMode));
-    if (els.languageFilters) {
-      $$("[data-language]", els.languageFilters).forEach((button) => button.classList.toggle("active", button.dataset.language === state.selectedLanguage));
-    }
-    $$("[data-mood]", els.moodFilters).forEach((button) => button.classList.toggle("active", button.dataset.mood === state.selectedMood));
+    if (els.languageFilters) els.languageFilters.value = state.selectedLanguage;
+    els.moodFilters.value = state.selectedMood;
     updateClock();
     setInterval(updateClock, 60000);
     renderPlaylist();

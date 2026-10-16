@@ -414,8 +414,14 @@ body[data-rain-mode="storm"].entered .scene-image {
 .entered .radio-console { transform: none; }
 
 .ui-idle .radio-console {
-  opacity: 0.24;
+  opacity: 0.32;
   transform: translateY(5px);
+}
+
+.ui-idle #shareButton {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #ffffff;
 }
 
 .ui-idle .brand,
@@ -678,21 +684,74 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 8px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
-.utility-row > button {
-  padding: 4px 0;
-  border: 0;
-  background: transparent;
-  color: rgba(255,255,255,.48);
-  font-size: 8px;
-  letter-spacing: .06em;
+#shareButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: rgba(255, 255, 255, 0.88);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  line-height: 1;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
-.utility-row > button:hover { color: var(--mint); }
-.utility-row div { display: flex; gap: 2px; }
+#shareButton svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#shareButton:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.26);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+#shareButton:active {
+  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+#shareButton:focus-visible {
+  outline: none;
+  border-color: rgba(0, 255, 204, 0.75);
+  box-shadow: 0 0 0 3px rgba(0, 255, 204, 0.22);
+  color: #ffffff;
+}
+
+.utility-row div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.utility-row .icon-button.small {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
 
 .playlist-drawer {
   position: absolute;
@@ -1573,17 +1632,19 @@ input[type="range"]::-moz-range-thumb { width: 9px; height: 9px; border: 0; bord
   .weather-note { display: none; }
   .chai-hotspot { left: 48.5%; bottom: 15.5%; width: 61px; }
   .radio-console {
-    right: 50%;
+    left: 0;
+    right: 0;
+    margin-inline: auto;
     bottom: var(--safe-bottom);
     width: min(365px, calc(100vw - 24px));
     padding: 15px 15px 12px;
-    transform: translate(50%, 14px);
+    transform: translateY(14px);
   }
-  .entered .radio-console { transform: translateX(50%); }
-  .ui-idle .radio-console { transform: translate(50%, 5px); }
+  .entered .radio-console { transform: none; }
+  .ui-idle .radio-console { transform: translateY(5px); }
   .radio-console:hover,
   .radio-console:focus-within,
-  .playlist-open .radio-console { transform: translateX(50%) !important; }
+  .playlist-open .radio-console { transform: none !important; }
   .track-copy { margin: 12px 0 8px; }
   .track-copy h2 { font-size: 20px; }
   .transport { margin: 7px 0 9px; }

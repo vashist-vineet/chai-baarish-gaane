@@ -219,7 +219,16 @@
         </div>
 
         <div class="utility-row">
-          <button id="shareButton">share this baarish ☕</button>
+          <button id="shareButton" aria-label="Share this moment" title="Share this moment">
+            <svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            <span>Share this moment</span>
+          </button>
           <div>
             <button class="icon-button small" id="lightningButton" aria-label="Call lightning" title="Call lightning">
               <svg class="lightning-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"/></svg>
@@ -240,32 +249,44 @@
           </div>
           <button class="icon-button" id="closePlaylist" aria-label="Close playlist">×</button>
         </div>
-        <div class="mood-filters language-filters" id="languageFilters" role="group" aria-label="Filter songs by language">
-          <button class="active" data-language="all">all</button>
-          <button data-language="hindi">hindi</button>
-          <button data-language="kannada">kannada</button>
-          <button data-language="malayalam">malayalam</button>
-          <button data-language="telugu">telugu</button>
-          <button data-language="tamil">tamil</button>
-          <button data-language="bengali">bengali</button>
-          <button data-language="marathi">marathi</button>
-          <button data-language="punjabi">punjabi</button>
-          <button data-language="odia">odia</button>
-          <button data-language="bhojpuri">bhojpuri</button>
-          <button data-language="assamese">assamese</button>
-          <button data-language="gujarati">gujarati</button>
-          <button data-language="rajasthani">rajasthani</button>
-        </div>
-        <div class="mood-filters" id="moodFilters" role="group" aria-label="Filter songs by mood">
-          <button class="active" data-mood="all">all</button>
-          <button data-mood="baarish">baarish</button>
-          <button data-mood="romantic">romantic</button>
-          <button data-mood="nostalgic">nostalgic</button>
-          <button data-mood="sad">sad</button>
-          <button data-mood="safar">safar</button>
-          <button data-mood="shaam">shaam</button>
-          <button data-mood="sukoon">sukoon</button>
-          <button data-mood="old-gold">old-gold</button>
+        <div class="playlist-filters" aria-label="Filter playlist">
+          <label class="playlist-filter language-filter" for="languageFilters">
+            <span>Language</span>
+            <span class="playlist-select-wrap">
+              <select id="languageFilters" aria-label="Filter songs by language">
+                <option value="all" data-language="all">All languages</option>
+                <option value="hindi" data-language="hindi">Hindi</option>
+                <option value="kannada" data-language="kannada">Kannada</option>
+                <option value="malayalam" data-language="malayalam">Malayalam</option>
+                <option value="telugu" data-language="telugu">Telugu</option>
+                <option value="tamil" data-language="tamil">Tamil</option>
+                <option value="bengali" data-language="bengali">Bengali</option>
+                <option value="marathi" data-language="marathi">Marathi</option>
+                <option value="punjabi" data-language="punjabi">Punjabi</option>
+                <option value="odia" data-language="odia">Odia</option>
+                <option value="bhojpuri" data-language="bhojpuri">Bhojpuri</option>
+                <option value="assamese" data-language="assamese">Assamese</option>
+                <option value="gujarati" data-language="gujarati">Gujarati</option>
+                <option value="rajasthani" data-language="rajasthani">Rajasthani</option>
+              </select>
+            </span>
+          </label>
+          <label class="playlist-filter mood-filter" for="moodFilters">
+            <span>Mood</span>
+            <span class="playlist-select-wrap">
+              <select id="moodFilters" aria-label="Filter songs by mood">
+                <option value="all" data-mood="all">All moods</option>
+                <option value="baarish" data-mood="baarish">Baarish</option>
+                <option value="romantic" data-mood="romantic">Romantic</option>
+                <option value="nostalgic" data-mood="nostalgic">Nostalgic</option>
+                <option value="sad" data-mood="sad">Sad</option>
+                <option value="safar" data-mood="safar">Safar</option>
+                <option value="shaam" data-mood="shaam">Shaam</option>
+                <option value="sukoon" data-mood="sukoon">Sukoon</option>
+                <option value="old-gold" data-mood="old-gold">Old-gold</option>
+              </select>
+            </span>
+          </label>
         </div>
         <ol class="playlist" id="playlist"></ol>
         <p class="drawer-foot">YouTube embeds · if a song is unavailable, the cassette moves on.</p>
@@ -378,8 +399,10 @@
         <p>This free rainy-evening radio pairs timeless Hindi film songs with natural rain, thunder and a warm Indian veranda. JavaScript is required for the interactive music player.</p>
       </section>
     </noscript>
-    <script src="playlist.js?v=rajasthani-playlist-20261013-1"></script>
-    <script src="script.js?v=rajasthani-language-20261013-1" defer></script>
+    <script src="playlist.js?v=hindi-catalog-20261016-5"></script>
+    <script src="hindi-playback-eligibility.js?v=verified-hindi-20261016-1"></script>
+    <script src="share-context.js?v=verified-hindi-20261016-1"></script>
+    <script src="script.js?v=verified-hindi-20261016-1" defer></script>
     <script src="chat.js?v=chat-discovery-20261008-1" defer></script>
   </body>
 </html>
