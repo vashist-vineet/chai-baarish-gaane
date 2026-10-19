@@ -3932,8 +3932,32 @@ body[data-environment="coast"] .radio-console {
 
 .chat-room { display: flex; flex: 1; min-height: 0; flex-direction: column; }
 .chat-room[hidden], .chat-name-gate[hidden] { display: none; }
-.chat-status { min-height: 23px; padding: 7px 2px 5px; color: #d39a94; font-size: 8px; letter-spacing: .04em; }
+.chat-status {
+  display: flex;
+  min-height: 29px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 2px 5px;
+  color: #d39a94;
+  font-size: 9px;
+  line-height: 1.45;
+  letter-spacing: .04em;
+}
 .chat-status.connected { color: rgba(185,217,212,.65); }
+.chat-status button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 5px 10px;
+  border: 1px solid rgba(233,185,116,.28);
+  border-radius: 999px;
+  background: rgba(233,185,116,.08);
+  color: #f0c88d;
+  font: 700 8px/1 Inter, ui-sans-serif, sans-serif;
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.chat-status button[hidden] { display: none; }
 
 .chat-stream {
   position: relative;

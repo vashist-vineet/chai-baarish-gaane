@@ -27,7 +27,7 @@
     <link rel="preload" href="assets/images/autumn/veranda-himalayan-autumn.jpg" as="image" type="image/jpeg" />
     <link rel="preconnect" href="https://www.youtube.com" />
     <link rel="dns-prefetch" href="https://i.ytimg.com" />
-    <link rel="stylesheet" href="style.css?v=playlist-environment-glass-20261014-1" />
+    <link rel="stylesheet" href="style.css?v=chat-connect-20261019-1" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -305,6 +305,11 @@
           </div>
         </header>
 
+        <div class="chat-status" id="chatStatus" role="status" aria-live="polite" aria-atomic="true">
+          <span id="chatStatusText">Connecting to the mehfil…</span>
+          <button id="chatRetry" type="button" hidden>Retry</button>
+        </div>
+
         <section class="chat-name-gate" id="chatNameGate" aria-labelledby="chatNameTitle">
           <p aria-hidden="true">☕</p>
           <h3 id="chatNameTitle">Chai kis naam se piyoge?</h3>
@@ -315,7 +320,6 @@
         </section>
 
         <div class="chat-room" id="chatRoom" hidden>
-          <div class="chat-status" id="chatStatus" role="status" aria-live="polite">connection jod rahe hain…</div>
           <div class="chat-stream" id="chatStream" role="log" aria-label="Live chat messages" aria-live="off" tabindex="0">
             <div class="chat-empty" id="chatEmpty">
               <span aria-hidden="true">☕</span>
@@ -403,6 +407,6 @@
     <script src="hindi-playback-eligibility.js?v=verified-hindi-20261016-1"></script>
     <script src="share-context.js?v=verified-hindi-20261016-1"></script>
     <script src="script.js?v=verified-hindi-20261016-1" defer></script>
-    <script src="chat.js?v=chat-discovery-20261008-1" defer></script>
+    <script src="chat.js?v=chat-connect-20261019-1" defer></script>
   </body>
 </html>

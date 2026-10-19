@@ -3,6 +3,8 @@
 
   const NAME_KEY = "cbg-chai-chat-name";
   const MAX_MESSAGE_LENGTH = 400;
+  const WAKE_MESSAGE_DELAY_MS = 6000;
+  const FAILURE_MESSAGE_DELAY_MS = 39000;
   const REACTIONS = ["❤️", "☕", "🌧️", "✨"];
   const ENVIRONMENT_ICONS = Object.freeze({ monsoon: "🌧️", winter: "❄️", spring: "🌸", autumn: "🍂", desert: "🏜️", coast: "🌊" });
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -17,6 +19,8 @@
     join: $("#chatJoin"),
     room: $("#chatRoom"),
     status: $("#chatStatus"),
+    statusText: $("#chatStatusText"),
+    retry: $("#chatRetry"),
     stream: $("#chatStream"),
     empty: $("#chatEmpty"),
     newMessages: $("#chatNewMessages"),
@@ -43,7 +47,13 @@
     messages: new Map(),
     ownReactions: new Set(),
     reported: new Set(),
-    loadingSocket: null
+    loadingSocket: null,
+    socketPromise: null,
+    joinPromise: null,
+    joinGeneration: 0,
+    wakeTimer: null,
+    connectionStatusGeneration: 0,
+    connectionFailureActive: false
   };
 
   function readName() {
@@ -63,12 +73,52 @@
     return String(window.CBG_CHAT_SERVER_URL || configured || location.origin).replace(/\/$/u, "");
   }
 
-  function setStatus(copy, connected = state.connected) {
-    els.status.textContent = copy;
+  function updateComposerAvailability() {
+    const ready = Boolean(state.connected && state.joined && state.name);
+    els.send.disabled = !ready;
+    els.message.disabled = !ready;
+  }
+
+  function setStatus(copy, connected = state.connected, retryable = false) {
+    els.statusText.textContent = copy;
     els.status.classList.toggle("connected", connected);
     els.launch?.classList.toggle("connected", connected);
-    els.send.disabled = !connected;
-    els.message.disabled = !connected;
+    els.retry.hidden = !retryable;
+    updateComposerAvailability();
+  }
+
+  function clearWakeTimer() {
+    if (state.wakeTimer) clearTimeout(state.wakeTimer);
+    state.wakeTimer = null;
+  }
+
+  function beginConnectionStatus(copy = "Connecting to the mehfil…") {
+    clearWakeTimer();
+    state.connectionFailureActive = false;
+    const generation = ++state.connectionStatusGeneration;
+    setStatus(copy, false);
+    if (!state.open) return;
+    state.wakeTimer = setTimeout(() => {
+      if (generation !== state.connectionStatusGeneration || state.connected || !state.open) return;
+      setStatus("The mehfil is waking up—first connection may take a little longer.", false);
+      state.wakeTimer = setTimeout(() => {
+        state.wakeTimer = null;
+        if (generation === state.connectionStatusGeneration && !state.connected && state.open) showConnectionFailure();
+      }, FAILURE_MESSAGE_DELAY_MS);
+    }, WAKE_MESSAGE_DELAY_MS);
+  }
+
+  function showConnectionFailure() {
+    state.connectionStatusGeneration += 1;
+    state.connectionFailureActive = true;
+    clearWakeTimer();
+    setStatus("Couldn’t reach the mehfil. Please try again.", false, true);
+  }
+
+  function invalidateJoinAttempt() {
+    state.joinGeneration += 1;
+    state.joinPromise = null;
+    state.joined = false;
   }
 
   function setOpenState(open) {
@@ -90,8 +140,17 @@
       script.src = `${chatServerUrl()}/socket.io/socket.io.js`;
       script.async = true;
       script.crossOrigin = "anonymous";
-      script.onload = () => window.io ? resolve(window.io) : reject(new Error("Socket.IO client unavailable"));
-      script.onerror = () => reject(new Error("Chat server unavailable"));
+      script.onload = () => {
+        if (window.io) resolve(window.io);
+        else {
+          script.remove();
+          reject(new Error("Socket.IO client unavailable"));
+        }
+      };
+      script.onerror = () => {
+        script.remove();
+        reject(new Error("Chat server unavailable"));
+      };
       document.head.appendChild(script);
     }).catch((error) => {
       state.loadingSocket = null;
@@ -102,47 +161,65 @@
 
   async function ensureSocket() {
     if (state.socket) {
-      if (!state.socket.connected) state.socket.connect();
+      if (!state.socket.connected) {
+        beginConnectionStatus("Reconnecting to the mehfil…");
+        state.socket.connect();
+      }
       return state.socket;
     }
-    setStatus("connection jod rahe hain…", false);
-    const io = await loadSocketClient();
-    const socket = io(chatServerUrl(), { autoConnect: true, reconnection: true, reconnectionDelayMax: 4000 });
-    state.socket = socket;
-    socket.on("connect", () => {
-      state.connected = true;
-      setStatus("mehfil live hai", true);
-      if (state.open && state.name) joinChat();
-    });
-    socket.on("disconnect", () => {
-      state.connected = false;
-      state.joined = false;
-      setStatus("connection dobara jod rahe hain…", false);
-    });
-    socket.on("connect_error", () => setStatus("chat server abhi nahi mil raha…", false));
-    socket.on("chat:init", ({ messages = [], presence = 0 } = {}) => {
-      state.messages.clear();
-      els.stream.querySelectorAll(".chat-message").forEach((node) => node.remove());
-      messages.forEach(upsertMessage);
-      els.presence.textContent = presenceCopy(presence);
-      updateEmpty();
-      scrollToBottom(false);
-    });
-    socket.on("chat:message", (message) => {
-      const nearBottom = isNearBottom();
-      upsertMessage(message);
-      if (nearBottom) scrollToBottom();
-      else els.newMessages.hidden = false;
-    });
-    socket.on("chat:reaction", ({ messageId, reactions } = {}) => {
-      const message = state.messages.get(messageId);
-      if (!message) return;
-      message.reactions = reactions;
-      upsertMessage(message);
-    });
-    socket.on("chat:delete", ({ messageId } = {}) => removeMessage(messageId));
-    socket.on("presence:update", ({ count = 0 } = {}) => { els.presence.textContent = presenceCopy(count); });
-    return socket;
+    if (state.socketPromise) return state.socketPromise;
+    beginConnectionStatus();
+    state.socketPromise = (async () => {
+      const io = await loadSocketClient();
+      if (state.socket) return state.socket;
+      const socket = io(chatServerUrl(), { autoConnect: true, reconnection: true, reconnectionDelayMax: 4000 });
+      state.socket = socket;
+      socket.on("connect", () => {
+        state.connected = true;
+        state.connectionStatusGeneration += 1;
+        state.connectionFailureActive = false;
+        clearWakeTimer();
+        updateComposerAvailability();
+        if (state.open && state.name) void joinChat();
+        else setStatus("Connected—enter your name to join the mehfil.", true);
+      });
+      socket.on("disconnect", () => {
+        state.connected = false;
+        invalidateJoinAttempt();
+        beginConnectionStatus("Reconnecting to the mehfil…");
+      });
+      socket.on("connect_error", () => {
+        if (!state.connected && !state.connectionFailureActive) setStatus("Reconnecting to the mehfil…", false);
+      });
+      socket.io?.on("reconnect_attempt", () => {
+        if (!state.connectionFailureActive) setStatus("Reconnecting to the mehfil…", false);
+      });
+      socket.io?.on("reconnect_failed", showConnectionFailure);
+      socket.on("chat:init", ({ messages = [], presence = 0 } = {}) => {
+        state.messages.clear();
+        els.stream.querySelectorAll(".chat-message").forEach((node) => node.remove());
+        messages.forEach(upsertMessage);
+        els.presence.textContent = presenceCopy(presence);
+        updateEmpty();
+        scrollToBottom(false);
+      });
+      socket.on("chat:message", (message) => {
+        const nearBottom = isNearBottom();
+        upsertMessage(message);
+        if (nearBottom) scrollToBottom();
+        else els.newMessages.hidden = false;
+      });
+      socket.on("chat:reaction", ({ messageId, reactions } = {}) => {
+        const message = state.messages.get(messageId);
+        if (!message) return;
+        message.reactions = reactions;
+        upsertMessage(message);
+      });
+      socket.on("chat:delete", ({ messageId } = {}) => removeMessage(messageId));
+      socket.on("presence:update", ({ count = 0 } = {}) => { els.presence.textContent = presenceCopy(count); });
+      return socket;
+    })().finally(() => { state.socketPromise = null; });
+    return state.socketPromise;
   }
 
   function emitWithAck(event, payload) {
@@ -156,43 +233,63 @@
   }
 
   async function joinChat() {
-    if (!state.name || !state.socket?.connected || !state.open) return;
-    const result = await emitWithAck("chat:join", { name: state.name });
-    state.joined = Boolean(result.ok);
-    if (!result.ok) setStatus(result.error || "Mehfil join nahi hui.", false);
+    if (!state.name || !state.socket?.connected || !state.open || state.joined) return;
+    if (state.joinPromise) return state.joinPromise;
+    const socket = state.socket;
+    const name = state.name;
+    const generation = state.joinGeneration;
+    let joinPromise;
+    joinPromise = (async () => {
+      try {
+        const result = await emitWithAck("chat:join", { name });
+        if (state.joinGeneration !== generation || state.socket !== socket || !socket.connected || !state.open || state.name !== name) return result;
+        state.joined = Boolean(result.ok);
+        if (result.ok) setStatus("mehfil live hai", true);
+        else setStatus(result.error || "Mehfil join nahi hui.", false);
+        return result;
+      } finally {
+        if (state.joinPromise === joinPromise) state.joinPromise = null;
+      }
+    })();
+    state.joinPromise = joinPromise;
+    return joinPromise;
   }
 
-  async function openChat() {
+  function connectForOpen() {
+    return ensureSocket()
+      .then(() => joinChat())
+      .catch(() => showConnectionFailure());
+  }
+
+  function openChat() {
     if (document.body.classList.contains("playlist-open")) els.playlistClose?.click();
     state.open = true;
     document.body.classList.add("chat-open");
     setOpenState(true);
     els.drawer.removeAttribute("inert");
     els.drawer.setAttribute("aria-hidden", "false");
+    void connectForOpen();
     if (!state.name) {
       showNameGate();
       requestAnimationFrame(() => els.nameInput.focus());
       return;
     }
     showRoom();
-    try {
-      await ensureSocket();
-      if (state.socket.connected) await joinChat();
-      els.message.focus();
-    } catch {
-      setStatus("chat server abhi nahi mil raha…", false);
-    }
+    requestAnimationFrame(() => els.message.focus());
   }
 
   function closeChat() {
     state.open = false;
-    state.joined = false;
+    invalidateJoinAttempt();
+    state.connectionStatusGeneration += 1;
+    clearWakeTimer();
     state.socket?.emit("chat:leave");
     document.body.classList.remove("chat-open");
     setOpenState(false);
     els.drawer.setAttribute("aria-hidden", "true");
     els.drawer.setAttribute("inert", "");
     cancelReply();
+    updateComposerAvailability();
     (els.launch || els.chai).focus();
   }
 
@@ -226,7 +323,7 @@
       else await joinChat();
       els.message.focus();
     } catch {
-      setStatus("chat server abhi nahi mil raha…", false);
+      showConnectionFailure();
     }
   }
 
@@ -347,13 +444,19 @@
 
   async function sendMessage() {
     const text = els.message.value.trim();
-    if (!text || text.length > MAX_MESSAGE_LENGTH || !state.connected) return;
+    const socket = state.socket;
+    const generation = state.joinGeneration;
+    if (!text || text.length > MAX_MESSAGE_LENGTH || !state.open || !state.joined || !socket?.connected) return;
     els.send.disabled = true;
     const result = await emitWithAck("chat:message", {
       text,
       environment: currentEnvironment(),
       replyTo: state.replyTo?.id || null
     });
+    if (state.joinGeneration !== generation || state.socket !== socket || !socket.connected || !state.open || !state.joined) {
+      updateComposerAvailability();
+      return;
+    }
     if (result.ok) {
       els.message.value = "";
       els.message.style.height = "auto";
@@ -361,7 +464,7 @@
       scrollToBottom();
       setStatus("mehfil live hai", true);
     } else setStatus(result.error || "Message nahi gaya.", state.connected);
-    els.send.disabled = !state.connected;
+    updateComposerAvailability();
     els.message.focus();
   }
 
@@ -369,6 +472,7 @@
   els.launch?.addEventListener("click", openChat);
   els.close.addEventListener("click", closeChat);
   els.join.addEventListener("click", saveName);
+  els.retry.addEventListener("click", () => { void connectForOpen(); });
   els.nameInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") { event.preventDefault(); saveName(); }
   });
