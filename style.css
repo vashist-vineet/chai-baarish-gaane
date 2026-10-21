@@ -2162,7 +2162,8 @@ body[data-environment="coast"] .playlist-drawer {
 .entry-v2 h2 .title-baarish:first-child {
   display: block;
   margin: 0;
-  animation-delay: 1.15s;
+  opacity: 1;
+  animation-delay: 0s;
 }
 
 .entry-v2 h2 .title-gaane:nth-child(2) {
@@ -2557,7 +2558,7 @@ body[data-environment="coast"] .playlist-drawer {
 }
 
 .winter-scene-image {
-  --scene-art: url("assets/images/winter/veranda-himalayan-winter.jpg");
+  --scene-art: none;
   --scene-fit: cover;
   --scene-position: 50% 50%;
   overflow: hidden;
@@ -2684,7 +2685,7 @@ body[data-environment="winter"].winter-warm-event .winter-house-lights {
 }
 
 .spring-scene-image {
-  --scene-art: url("assets/images/spring/veranda-himalayan-spring.jpg");
+  --scene-art: none;
   --scene-fit: cover;
   --scene-position: 50% 50%;
   overflow: hidden;
@@ -3285,7 +3286,7 @@ body[data-environment="spring"] .radio-console {
 
 /* Autumn uses a dedicated warm golden scene based on the same geography */
 .autumn-scene-image {
-  --scene-art: url("assets/images/autumn/veranda-himalayan-autumn.jpg");
+  --scene-art: none;
   --scene-fit: cover;
   --scene-position: 50% 50%;
   overflow: hidden;
@@ -3520,7 +3521,7 @@ body.environment-transitioning.environment-from-autumn .environment-mist { anima
 }
 
 .desert-scene-image {
-  --scene-art: url("assets/images/desert/veranda-thar-refined-v3.png");
+  --scene-art: none;
   --scene-fit: cover;
   --scene-position: 50% 50%;
   overflow: hidden;
@@ -3679,7 +3680,7 @@ body[data-environment="desert"] .radio-console {
 }
 
 .coast-scene-image {
-  --scene-art: url("assets/images/coast/veranda-konkan-candidate-v1.png");
+  --scene-art: none;
   --scene-fit: cover;
   --scene-position: 50% 50%;
   overflow: hidden;
