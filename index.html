@@ -21,13 +21,10 @@
     <title>Chai Baarish Gaane — Old Hindi Songs &amp; Monsoon Radio</title>
     <link rel="icon" href="assets/images/cbg-mark.svg" type="image/svg+xml" />
     <link rel="manifest" href="site.webmanifest" />
-    <link rel="preload" href="assets/images/veranda-monsoon.jpg" as="image" type="image/jpeg" fetchpriority="high" />
-    <link rel="preload" href="assets/images/winter/veranda-himalayan-winter.jpg" as="image" type="image/jpeg" />
-    <link rel="preload" href="assets/images/spring/veranda-himalayan-spring.jpg" as="image" type="image/jpeg" />
-    <link rel="preload" href="assets/images/autumn/veranda-himalayan-autumn.jpg" as="image" type="image/jpeg" />
+    <link rel="preload" href="assets/images/veranda-monsoon.jpg" as="image" type="image/jpeg" fetchpriority="low" />
     <link rel="preconnect" href="https://www.youtube.com" />
     <link rel="dns-prefetch" href="https://i.ytimg.com" />
-    <link rel="stylesheet" href="style.css?v=chat-connect-20261019-1" />
+    <link rel="stylesheet" href="style.css?v=environment-media-20261019-1" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -99,16 +96,16 @@
             autoplay
             loop
             playsinline
-            preload="metadata"
+            preload="none"
             aria-hidden="true"
           >
-            <source src="assets/video/coast/samundar-loop.webm" type="video/webm" />
-            <source src="assets/video/coast/samundar-loop.mp4" type="video/mp4" />
+            <source data-src="assets/video/coast/samundar-loop.webm" type="video/webm" />
+            <source data-src="assets/video/coast/samundar-loop.mp4" type="video/mp4" />
           </video>
           <div class="coast-haze"></div>
           <img
             class="coast-foreground"
-            src="assets/images/coast/samundar-foreground-prototype.png"
+            data-src="assets/images/coast/samundar-foreground-prototype.png"
             alt=""
             aria-hidden="true"
           />
@@ -406,7 +403,7 @@
     <script src="playlist.js?v=hindi-catalog-20261016-5"></script>
     <script src="hindi-playback-eligibility.js?v=verified-hindi-20261016-1"></script>
     <script src="share-context.js?v=verified-hindi-20261016-1"></script>
-    <script src="script.js?v=verified-hindi-20261016-1" defer></script>
+    <script src="script.js?v=playlist-lazy-render-20261019-1" defer></script>
     <script src="chat.js?v=chat-connect-20261019-1" defer></script>
   </body>
 </html>

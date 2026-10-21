@@ -166,6 +166,7 @@
     leafCanvas: $("#leafCanvas"),
     sandCanvas: $("#sandCanvas"),
     coastVideo: $("#coastVideo"),
+    coastForeground: $(".coast-foreground"),
     environmentButton: $("#environmentButton"),
     environmentSwitch: $("#environmentSwitch"),
     environmentButtonText: $("#environmentButtonText"),
@@ -237,6 +238,8 @@
     currentTrackIndex: initialContext.trackIndex,
     selectedLanguage: initialContext.language,
     selectedMood: initialContext.mood,
+    playlistRendered: false,
+    playlistRenderKey: "",
     recentHistory: [],
     environment: initialContext.environment,
     environmentTransitioning: false,
@@ -287,6 +290,14 @@
   let environmentAttentionDue = false;
   let audioUnlocked = false;
   let audioUnlockPromise = null;
+
+  const ENVIRONMENT_ART = Object.freeze({
+    winter: Object.freeze({ selector: ".winter-scene-image", src: "assets/images/winter/veranda-himalayan-winter.jpg" }),
+    spring: Object.freeze({ selector: ".spring-scene-image", src: "assets/images/spring/veranda-himalayan-spring.jpg" }),
+    autumn: Object.freeze({ selector: ".autumn-scene-image", src: "assets/images/autumn/veranda-himalayan-autumn.jpg" }),
+    desert: Object.freeze({ selector: ".desert-scene-image", src: "assets/images/desert/veranda-thar-refined-v3.png" }),
+    coast: Object.freeze({ selector: ".coast-scene-image", src: "assets/images/coast/veranda-konkan-candidate-v1.png" })
+  });
 
   const AUDIO_UNLOCK_EVENTS = ["pointerdown", "touchstart", "keydown"];
 
@@ -398,12 +409,12 @@
     }
 
     createMediaLayer(config, destination, loop) {
-      const audio = new Audio(config.src);
+      const audio = new Audio();
       const source = this.context.createMediaElementSource(audio);
       const gain = this.context.createGain();
       const filter = this.context.createBiquadFilter();
       audio.loop = loop;
-      audio.preload = "auto";
+      audio.preload = "none";
       audio.playsInline = true;
       audio.playbackRate = config.rate || 1;
       filter.type = "lowpass";
@@ -418,7 +429,45 @@
           }
         }, { once: true });
       }
-      return { audio, source, filter, gain };
+      return { ...config, audio, source, filter, gain, src: config.src, sourceAttached: false };
+    }
+
+    ensureLayerSource(layer) {
+      if (!layer || !layer.src || layer.sourceAttached) return layer;
+      layer.sourceAttached = true;
+      layer.audio.preload = "auto";
+      layer.audio.src = layer.src;
+      layer.audio.load();
+      return layer;
+    }
+
+    async playLayer(layer) {
+      if (!layer) return false;
+      this.ensureLayerSource(layer);
+      try {
+        await layer.audio.play();
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    getEnvironmentLayers(environment = (state.entered ? state.environment : "monsoon")) {
+      switch (environment) {
+        case "winter":
+          return [this.winterWindLayer].filter(Boolean);
+        case "spring":
+          return [this.springBreezeLayer].filter(Boolean);
+        case "autumn":
+          return [this.autumnWindLayer].filter(Boolean);
+        case "desert":
+          return [this.desertWindLayer].filter(Boolean);
+        case "coast":
+          return [this.coastBreezeLayer].filter(Boolean);
+        case "monsoon":
+        default:
+          return [...this.rainLayers, (state.ambienceOn ? this.windLayer : null)].filter(Boolean);
+      }
     }
 
     createProceduralCoastLayer(destination) {
@@ -454,17 +503,10 @@
       return { source, highpass, lowpass, gain };
     }
 
-    async startRainRecordings() {
-      const layers = [
-        ...this.rainLayers,
-        this.windLayer,
-        this.winterWindLayer,
-        this.autumnWindLayer,
-        this.desertWindLayer,
-        this.coastBreezeLayer
-      ].filter(Boolean);
-      const results = await Promise.allSettled(layers.map((layer) => layer.audio.play()));
-      return results.some((result) => result.status === "fulfilled");
+    async startRainRecordings(environment = (state.entered ? state.environment : "monsoon")) {
+      const layers = this.getEnvironmentLayers(environment);
+      const results = await Promise.allSettled(layers.map((layer) => this.playLayer(layer)));
+      return results.some((result) => result.status === "fulfilled" && result.value === true);
     }
 
     ramp(gainNode, value, seconds = 0.5) {
@@ -476,6 +518,7 @@
     }
 
     setRainVolume(value, seconds = 0.4) {
+      if (!this.initialized) return;
       const modeBoost = { light: 0.68, medium: 0.92, heavy: 1.12, storm: 1.28 }[state.rainMode] || 1;
       const environment = state.entered ? state.environment : "monsoon";
       const rainTarget = environment === "monsoon" ? Math.min(0.48, value * modeBoost * this.weatherDrift) : 0;
@@ -525,7 +568,11 @@
     }
 
     setAmbience(on, seconds = 0.6) {
+      if (!this.initialized) return;
       const active = (state.entered ? state.environment : "monsoon") === "monsoon";
+      if (active && on && this.windLayer) {
+        this.playLayer(this.windLayer);
+      }
       this.ramp(this.ambienceGain, active && on ? DEFAULTS.ambienceVolume : 0, seconds);
       if (!active) this.setRainVolume(state.rainVolume, seconds);
     }
@@ -538,16 +585,19 @@
       const autumn = environment === "autumn";
       const desert = environment === "desert";
       const coast = environment === "coast";
-      const monsoonLayers = [...this.rainLayers, this.windLayer].filter(Boolean);
-      const winterLayers = [this.winterWindLayer].filter(Boolean);
-      const springLayers = [this.springBreezeLayer].filter(Boolean);
-      const autumnLayers = [this.autumnWindLayer].filter(Boolean);
-      const desertLayers = [this.desertWindLayer].filter(Boolean);
-      const coastLayers = [this.coastBreezeLayer].filter(Boolean);
-      const activeLayers = winter ? winterLayers : spring ? springLayers : autumn ? autumnLayers : desert ? desertLayers : coast ? coastLayers : monsoonLayers;
-      const inactiveLayers = [...monsoonLayers, ...winterLayers, ...springLayers, ...autumnLayers, ...desertLayers, ...coastLayers].filter((layer) => !activeLayers.includes(layer));
+      const activeLayers = this.getEnvironmentLayers(environment);
+      const allAtmosphereLayers = [
+        ...this.rainLayers,
+        this.windLayer,
+        this.winterWindLayer,
+        this.springBreezeLayer,
+        this.autumnWindLayer,
+        this.desertWindLayer,
+        this.coastBreezeLayer
+      ].filter(Boolean);
+      const inactiveLayers = allAtmosphereLayers.filter((layer) => !activeLayers.includes(layer));
 
-      activeLayers.forEach((layer) => layer.audio.play().catch(() => {}));
+      activeLayers.forEach((layer) => this.playLayer(layer));
 
       this.ramp(this.thunderGain, environment === "monsoon" ? 0.82 : 0, seconds);
       this.ramp(this.ambienceGain, environment === "monsoon" && state.ambienceOn ? DEFAULTS.ambienceVolume : 0, seconds);
@@ -562,7 +612,9 @@
       setTimeout(() => {
         const activeEnvironment = state.entered ? state.environment : "monsoon";
         if (token !== this.environmentToken || activeEnvironment !== environment) return;
-        inactiveLayers.filter(Boolean).forEach((layer) => layer.audio.pause());
+        inactiveLayers.forEach((layer) => {
+          if (layer.sourceAttached) layer.audio.pause();
+        });
       }, Math.max(250, seconds * 1000 + 120));
     }
 
@@ -579,6 +631,7 @@
       if (state.environment !== "monsoon" || !this.burstLayer || !this.context) return;
       const now = this.context.currentTime;
       const layer = this.burstLayer;
+      this.ensureLayerSource(layer);
       layer.audio.pause();
       layer.audio.currentTime = 0;
       layer.audio.play().catch(() => {});
@@ -592,7 +645,7 @@
 
     setWind(active, seconds = 1.2) {
       if (state.environment !== "monsoon" || !this.windLayer) return;
-      if (active) this.windLayer.audio.play().catch(() => {});
+      if (active) this.playLayer(this.windLayer);
       this.ramp(this.windLayer.gain, active ? 0.82 : 0, seconds);
     }
 
@@ -608,6 +661,7 @@
       if (!layer) return false;
       this.lastThunderIndex = index;
       this.thunderActiveUntil = Date.now() + layer.tail * 1000;
+      this.ensureLayerSource(layer);
       layer.audio.pause();
       layer.audio.currentTime = 0;
       layer.audio.play().catch(() => {});
@@ -626,7 +680,7 @@
       const modeBoost = { light: 0.72, medium: 0.94, heavy: 1.14, storm: 1.32 }[state.rainMode] || 1;
       const winterAmbience = state.ambienceOn ? 1 : 0.72;
       const resting = Math.min(0.18, state.rainVolume * modeBoost * 0.48 * this.weatherDrift * winterAmbience);
-      this.winterWindLayer?.audio.play().catch(() => {});
+      if (this.winterWindLayer) this.playLayer(this.winterWindLayer);
       this.ramp(this.winterGain, Math.min(0.26, resting + Math.min(0.075, state.rainVolume * 0.34)), 0.8);
       setTimeout(() => {
         if (state.environment === "winter") this.ramp(this.winterGain, resting, 2.4);
@@ -638,7 +692,7 @@
       const modeBoost = { light: 0.7, medium: 0.9, heavy: 1.12, storm: 1.3 }[state.rainMode] || 1;
       const springAmbience = state.ambienceOn ? 1 : 0.58;
       const resting = Math.min(0.115, state.rainVolume * modeBoost * 0.31 * this.weatherDrift * springAmbience);
-      this.springBreezeLayer?.audio.play().catch(() => {});
+      if (this.springBreezeLayer) this.playLayer(this.springBreezeLayer);
       this.ramp(this.springGain, Math.min(0.17, resting + Math.min(0.05, state.rainVolume * 0.22)), 0.9);
       setTimeout(() => {
         if (state.environment === "spring") this.ramp(this.springGain, resting, 2.6);
@@ -650,7 +704,7 @@
       const modeBoost = { light: 0.68, medium: 0.9, heavy: 1.1, storm: 1.28 }[state.rainMode] || 1;
       const autumnAmbience = state.ambienceOn ? 1 : 0.62;
       const resting = Math.min(0.10, state.rainVolume * modeBoost * 0.26 * this.weatherDrift * autumnAmbience);
-      this.autumnWindLayer?.audio.play().catch(() => {});
+      if (this.autumnWindLayer) this.playLayer(this.autumnWindLayer);
       this.ramp(this.autumnGain, Math.min(0.22, resting + Math.min(0.06, state.rainVolume * 0.28)), 0.9);
       setTimeout(() => {
         if (state.environment === "autumn") this.ramp(this.autumnGain, resting, 2.8);
@@ -662,7 +716,7 @@
       const modeBoost = { light: 0.66, medium: 0.88, heavy: 1.08, storm: 1.26 }[state.rainMode] || 1;
       const desertAmbience = state.ambienceOn ? 1 : 0.58;
       const resting = Math.min(0.09, state.rainVolume * modeBoost * 0.24 * this.weatherDrift * desertAmbience);
-      this.desertWindLayer?.audio.play().catch(() => {});
+      if (this.desertWindLayer) this.playLayer(this.desertWindLayer);
       this.ramp(this.desertGain, Math.min(0.18, resting + Math.min(0.055, state.rainVolume * 0.25)), 0.9);
       setTimeout(() => {
         if (state.environment === "desert") this.ramp(this.desertGain, resting, 2.8);
@@ -674,12 +728,57 @@
       const modeBoost = { light: 0.66, medium: 0.88, heavy: 1.08, storm: 1.26 }[state.rainMode] || 1;
       const coastAmbience = state.ambienceOn ? 1 : 0.64;
       const resting = Math.min(0.12, state.rainVolume * modeBoost * 0.34 * this.weatherDrift * coastAmbience);
-      this.coastBreezeLayer?.audio.play().catch(() => {});
+      if (this.coastBreezeLayer) this.playLayer(this.coastBreezeLayer);
       this.ramp(this.coastGain, Math.min(0.18, resting + Math.min(0.045, state.rainVolume * 0.20)), 0.9);
       setTimeout(() => {
         if (state.environment === "coast") this.ramp(this.coastGain, resting, 2.8);
       }, Math.max(1800, duration * 1000 - 2800));
     }
+  }
+
+  class AnimationLoop {
+    constructor(render, activeWhen, onStart = null) {
+      this.render = render;
+      this.activeWhen = activeWhen;
+      this.onStart = onStart;
+      this.frameId = 0;
+      this.generation = 0;
+      this.tick = this.tick.bind(this);
+    }
+
+    refresh() {
+      if (this.frameId || !this.activeWhen()) return;
+      const generation = ++this.generation;
+      this.onStart?.();
+      this.frameId = requestAnimationFrame((now) => this.tick(now, generation));
+    }
+
+    sync() {
+      if (this.activeWhen()) this.refresh();
+      else this.stop();
+    }
+
+    stop() {
+      this.generation += 1;
+      if (this.frameId) cancelAnimationFrame(this.frameId);
+      this.frameId = 0;
+    }
+
+    tick(now, generation) {
+      this.frameId = 0;
+      if (generation !== this.generation || !this.activeWhen()) return;
+      this.render(now);
+      if (generation === this.generation && this.activeWhen()) {
+        this.frameId = requestAnimationFrame((nextNow) => this.tick(nextNow, generation));
+      }
+    }
+  }
+
+  function environmentEffectIsActive(environment) {
+    if (!state.entered) return false;
+    if (!state.environmentTransitioning) return state.environment === environment;
+    return document.body.classList.contains(`environment-from-${environment}`)
+      || document.body.classList.contains(`environment-to-${environment}`);
   }
 
   class RainCanvas {
@@ -698,7 +797,8 @@
       this.draw = this.draw.bind(this);
       window.addEventListener("resize", this.resize, { passive: true });
       this.resize();
-      requestAnimationFrame(this.draw);
+      this.loop = new AnimationLoop(this.draw, () => this.running && !document.hidden && this.activeWhen(), () => { this.lastTime = performance.now(); });
+      this.loop.refresh();
     }
 
     count() {
@@ -746,12 +846,11 @@
       setTimeout(() => { this.burstMultiplier = 1; }, 6000);
     }
 
+    refresh() {
+      this.loop.sync();
+    }
+
     draw(now) {
-      requestAnimationFrame(this.draw);
-      if (!this.running || document.hidden || !this.activeWhen()) {
-        this.lastTime = now;
-        return;
-      }
       const delta = Math.min(0.035, (now - this.lastTime) / 1000);
       this.lastTime = now;
       const ctx = this.context;
@@ -791,7 +890,8 @@
       this.draw = this.draw.bind(this);
       window.addEventListener("resize", this.resize, { passive: true });
       this.resize();
-      requestAnimationFrame(this.draw);
+      this.loop = new AnimationLoop(this.draw, () => this.running && !document.hidden && environmentEffectIsActive("winter"), () => { this.lastTime = performance.now(); });
+      this.loop.refresh();
     }
 
     count() {
@@ -847,14 +947,11 @@
       this.gustStrength = 0;
     }
 
-    draw(now) {
-      requestAnimationFrame(this.draw);
-      const active = state.entered && (state.environment === "winter" || state.environmentTransitioning);
-      if (!this.running || document.hidden || !active) {
-        this.lastTime = now;
-        return;
-      }
+    refresh() {
+      this.loop.sync();
+    }
 
+    draw(now) {
       const delta = Math.min(0.04, (now - this.lastTime) / 1000);
       this.lastTime = now;
       const ctx = this.context;
@@ -896,7 +993,8 @@
       this.draw = this.draw.bind(this);
       window.addEventListener("resize", this.resize, { passive: true });
       this.resize();
-      requestAnimationFrame(this.draw);
+      this.loop = new AnimationLoop(this.draw, () => this.running && !document.hidden && environmentEffectIsActive("spring"), () => { this.lastTime = performance.now(); });
+      this.loop.refresh();
     }
 
     count() {
@@ -965,14 +1063,11 @@
       this.petals = this.petals.filter((petal) => !petal.temporary);
     }
 
-    draw(now) {
-      requestAnimationFrame(this.draw);
-      const active = state.entered && (state.environment === "spring" || state.environmentTransitioning);
-      if (!this.running || document.hidden || !active) {
-        this.lastTime = now;
-        return;
-      }
+    refresh() {
+      this.loop.sync();
+    }
 
+    draw(now) {
       const delta = Math.min(0.04, (now - this.lastTime) / 1000);
       this.lastTime = now;
       const ctx = this.context;
@@ -1033,7 +1128,8 @@
       this.draw = this.draw.bind(this);
       window.addEventListener("resize", this.resize, { passive: true });
       this.resize();
-      requestAnimationFrame(this.draw);
+      this.loop = new AnimationLoop(this.draw, () => this.running && !document.hidden && environmentEffectIsActive("autumn"), () => { this.lastTime = performance.now(); });
+      this.loop.refresh();
     }
 
     count() {
@@ -1115,14 +1211,11 @@
       this.leaves = this.leaves.filter((l) => !l.temporary);
     }
 
-    draw(now) {
-      requestAnimationFrame(this.draw);
-      const active = state.entered && (state.environment === "autumn" || state.environmentTransitioning);
-      if (!this.running || document.hidden || !active) {
-        this.lastTime = now;
-        return;
-      }
+    refresh() {
+      this.loop.sync();
+    }
 
+    draw(now) {
       const delta = Math.min(0.04, (now - this.lastTime) / 1000);
       this.lastTime = now;
       const ctx = this.context;
@@ -1226,7 +1319,8 @@
       this.draw = this.draw.bind(this);
       window.addEventListener("resize", this.resize, { passive: true });
       this.resize();
-      requestAnimationFrame(this.draw);
+      this.loop = new AnimationLoop(this.draw, () => this.running && !document.hidden && environmentEffectIsActive("desert"), () => { this.lastTime = performance.now(); });
+      this.loop.refresh();
     }
 
     count() {
@@ -1308,14 +1402,11 @@
       this.grains = this.grains.filter((grain) => !grain.temporary);
     }
 
-    draw(now) {
-      requestAnimationFrame(this.draw);
-      const active = state.entered && (state.environment === "desert" || state.environmentTransitioning);
-      if (!this.running || document.hidden || !active) {
-        this.lastTime = now;
-        return;
-      }
+    refresh() {
+      this.loop.sync();
+    }
 
+    draw(now) {
       const delta = Math.min(0.04, (now - this.lastTime) / 1000);
       this.lastTime = now;
       const ctx = this.context;
@@ -1387,7 +1478,8 @@
       this.resize = this.resize.bind(this);
       this.update = this.update.bind(this);
       window.addEventListener("resize", this.resize, { passive: true });
-      requestAnimationFrame(this.update);
+      this.loop = new AnimationLoop(this.update, () => this.running && !document.hidden && state.entered && state.environment === "spring" && !state.environmentTransitioning, () => { this.lastTime = performance.now(); });
+      this.loop.sync();
     }
 
     maxCount() {
@@ -1505,26 +1597,23 @@
       }, 4500);
     }
 
-    update(now) {
-      requestAnimationFrame(this.update);
-      const active = state.entered && state.environment === "spring" && !state.environmentTransitioning;
-
-      if (!this.running || document.hidden) {
-        this.lastTime = now;
-        return;
+    clear() {
+      if (this.butterflies.length > 0) {
+        this.butterflies.forEach((butterfly) => butterfly.el.remove());
+        this.butterflies = [];
       }
+      this.nextZone = "center";
+    }
 
+    refresh() {
+      const active = this.running && state.entered && state.environment === "spring" && !state.environmentTransitioning;
+      if (!active) this.clear();
+      this.loop.sync();
+    }
+
+    update(now) {
       const delta = Math.min(0.05, (now - this.lastTime) / 1000);
       this.lastTime = now;
-
-      if (!active) {
-        if (this.butterflies.length > 0) {
-          this.butterflies.forEach(b => b.el.remove());
-          this.butterflies = [];
-        }
-        this.nextZone = "center";
-        return;
-      }
 
       this.timeSinceLastSpawn += delta * 1000;
       if (
@@ -1639,13 +1728,23 @@
 
   const atmosphere = new AudioAtmosphere();
 
-  const rain = new RainCanvas(els.canvas, () => state.entered && (state.environment === "monsoon" || state.environmentTransitioning));
+  const rain = new RainCanvas(els.canvas, () => environmentEffectIsActive("monsoon"));
   const entryRain = new RainCanvas(els.entryCanvas, () => !document.body.classList.contains("entry-settled"));
   const snow = new SnowCanvas(els.snowCanvas);
   const petals = new PetalCanvas(els.petalCanvas);
   const butterflies = new ButterflySystem(els.butterfliesContainer);
   const leaves = new LeafCanvas(els.leafCanvas);
   const dust = new SandCanvas(els.sandCanvas);
+
+  function syncEffectLoops() {
+    rain.refresh();
+    entryRain.refresh();
+    snow.refresh();
+    petals.refresh();
+    leaves.refresh();
+    dust.refresh();
+    butterflies.refresh();
+  }
   class CoastVideoController {
     constructor(video) {
       this.video = video;
@@ -1665,6 +1764,20 @@
       if (!this.shouldPlay()) video.pause();
     }
 
+    ensureSource() {
+      if (!this.video || this.sourceLoaded) return;
+      let sourceAdded = false;
+      this.video.querySelectorAll("source[data-src]").forEach((source) => {
+        if (source.getAttribute("src")) return;
+        source.setAttribute("src", source.dataset.src);
+        sourceAdded = true;
+      });
+      if (sourceAdded) {
+        this.sourceLoaded = true;
+        this.video.load();
+      }
+    }
+
     baselineRate() {
       return reducedMotion ? 0.62 : (COAST_PLAYBACK_RATES[state.rainMode] || COAST_PLAYBACK_RATES.medium);
     }
@@ -1676,6 +1789,7 @@
     play() {
       clearTimeout(this.pauseTimer);
       if (!this.video || reducedMotion || document.hidden) return;
+      this.ensureSource();
       this.setMode(true);
       const playback = this.video.play();
       if (playback?.catch) playback.catch(() => document.body.classList.remove("coast-video-ready"));
@@ -1744,6 +1858,21 @@
   }
 
   const coastVideo = new CoastVideoController(els.coastVideo);
+
+  function ensureEnvironmentMedia(environment) {
+    const art = ENVIRONMENT_ART[environment];
+    if (!art) return;
+    const sceneLayer = $(art.selector);
+    if (sceneLayer && sceneLayer.dataset.sceneArtLoaded !== "true") {
+      sceneLayer.style.setProperty("--scene-art", `url("${art.src}")`);
+      sceneLayer.dataset.sceneArtLoaded = "true";
+    }
+    if (environment !== "coast") return;
+    if (els.coastForeground && !els.coastForeground.getAttribute("src")) {
+      els.coastForeground.setAttribute("src", els.coastForeground.dataset.src);
+    }
+    coastVideo.ensureSource();
+  }
 
   function readPreferences() {
     try {
@@ -1886,6 +2015,23 @@
     });
   }
 
+  function playlistFilterKey() {
+    return `${state.selectedLanguage}\u0000${state.selectedMood}`;
+  }
+
+  function isPlaylistOpen() {
+    return document.body.classList.contains("playlist-open");
+  }
+
+  function updatePlaylistSummary(indices = filteredIndices()) {
+    updateFilterOptionCounts();
+    const config = ENVIRONMENTS[state.environment] || ENVIRONMENTS.monsoon;
+    if (els.drawerKicker) {
+      els.drawerKicker.textContent = `${indices.length} GAANE · ${config.drawerKicker}`;
+    }
+    return indices;
+  }
+
   function currentTrack() {
     return playlist[state.currentTrackIndex] || playlist[0];
   }
@@ -1906,18 +2052,27 @@
       els.elapsed.textContent = "0:00";
       els.duration.textContent = "—:—";
     }
-    $$("li", els.playlist).forEach((item) => item.classList.toggle("current", Number(item.dataset.index) === state.currentTrackIndex));
+    const previous = els.playlist.querySelector("li.current");
+    if (previous && Number(previous.dataset.index) !== state.currentTrackIndex) {
+      previous.classList.remove("current");
+    }
+    const current = els.playlist.querySelector(`li[data-index="${state.currentTrackIndex}"]`);
+    current?.classList.add("current");
   }
 
   function renderPlaylist() {
-    updateFilterOptionCounts();
-    const indices = filteredIndices();
-    const config = ENVIRONMENTS[state.environment] || ENVIRONMENTS.monsoon;
-    if (els.drawerKicker) {
-      els.drawerKicker.textContent = `${indices.length} GAANE · ${config.drawerKicker}`;
+    const indices = updatePlaylistSummary();
+    const filterKey = playlistFilterKey();
+    if (!isPlaylistOpen()) {
+      state.playlistRendered = false;
+      state.playlistRenderKey = filterKey;
+      return;
     }
+    if (state.playlistRendered && state.playlistRenderKey === filterKey) return;
     if (!indices.length) {
       els.playlist.innerHTML = '<li class="playlist-empty">Is filter combination mein abhi koi gaana nahi.</li>';
+      state.playlistRendered = true;
+      state.playlistRenderKey = filterKey;
       return;
     }
     els.playlist.innerHTML = indices.map((index, listIndex) => {
@@ -1930,6 +2085,8 @@
         </button>
       </li>`;
     }).join("");
+    state.playlistRendered = true;
+    state.playlistRenderKey = filterKey;
   }
 
   function escapeHtml(value) {
@@ -2506,6 +2663,7 @@
     const revealExperience = () => {
       state.entered = true;
       document.body.classList.add("entry-transition-active", "entered");
+      syncEffectLoops();
       if (state.environment === "coast") coastVideo.play();
       atmosphere.setEnvironment(state.environment, reducedMotion ? 1.2 : 3);
       playEntryWeatherCue();
@@ -2527,6 +2685,7 @@
       setTimeout(() => {
         document.body.classList.add("entry-settled");
         document.body.classList.remove("entering", "entry-transition-active");
+        syncEffectLoops();
       }, reducedMotion ? 80 : 760);
       setTimeout(() => showToast("Aaj kaam rehne do."), reducedMotion ? 250 : 1050);
       setTimeout(resetUiTimer, reducedMotion ? 300 : 1200);
@@ -2619,7 +2778,9 @@
       `environment-to-${nextEnvironment}`
     );
 
+    ensureEnvironmentMedia(nextEnvironment);
     state.environment = nextEnvironment;
+    syncEffectLoops();
     if (nextEnvironment === "coast") coastVideo.play();
     applyEnvironmentUi(nextEnvironment);
     atmosphere.setEnvironment(nextEnvironment, transitionMs / 1000);
@@ -2635,6 +2796,7 @@
       `environment-to-${nextEnvironment}`
     );
     state.environmentTransitioning = false;
+    syncEffectLoops();
     els.environmentButton.disabled = false;
     // Clear butterflies when leaving spring so they don't persist in memory
     if (previousEnvironment === "spring") butterflies.butterflies.length = 0;
@@ -3017,6 +3179,7 @@
     document.body.classList.add("playlist-open");
     els.playlistDrawer.removeAttribute("inert");
     els.playlistDrawer.setAttribute("aria-hidden", "false");
+    renderPlaylist();
     els.closePlaylist.focus();
   }
 
@@ -3273,10 +3436,7 @@
     });
 
     document.addEventListener("visibilitychange", () => {
-      rain.running = !document.hidden;
-      snow.running = !document.hidden;
-      petals.running = !document.hidden;
-      leaves.running = !document.hidden;
+      syncEffectLoops();
     });
     document.addEventListener("fullscreenchange", () => {
       const active = Boolean(document.fullscreenElement);
@@ -3305,16 +3465,17 @@
     els.ambience.setAttribute("aria-label", `Turn ambience ${state.ambienceOn ? "off" : "on"}`);
     els.console.dataset.shuffle = "false";
     document.body.dataset.rainMode = state.rainMode;
+    syncEffectLoops();
+    ensureEnvironmentMedia(state.environment);
     applyEnvironmentUi(state.environment);
     $$("[data-rain]").forEach((button) => button.classList.toggle("active", button.dataset.rain === state.rainMode));
     if (els.languageFilters) els.languageFilters.value = state.selectedLanguage;
     els.moodFilters.value = state.selectedMood;
     updateClock();
     setInterval(updateClock, 60000);
-    renderPlaylist();
+    updatePlaylistSummary();
     updateTrackUI();
     bindEvents();
-    atmosphere.start().then(confirmAudioUnlocked).catch(() => {});
     scheduleLandingLightning();
   }
 

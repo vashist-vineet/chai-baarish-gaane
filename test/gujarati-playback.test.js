@@ -109,7 +109,7 @@ test("Gujarati selector uses the existing persistence, queue, navigation, and re
   assert.match(html, /data-language="gujarati"/);
   assert.match(html, /playlist\.js\?v=hindi-catalog-20261016-5/);
   assert.match(html, /hindi-playback-eligibility\.js\?v=verified-hindi-20261016-1/);
-  assert.match(html, /script\.js\?v=verified-hindi-20261016-1/);
+  assert.match(html, /script\.js\?v=playlist-lazy-render-20261019-1/);
   assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani"\]\)/);
   assert.match(source, /availableLanguages\.has\(saved\.selectedLanguage\) \? saved\.selectedLanguage : "all"/);
   assert.match(source, /function filteredIndices\(\) \{\s*return eligibleTrackIndices/);

@@ -133,7 +133,7 @@ test("playlist rendering and every navigation path consume eligible pools", () =
   assert.match(html, /playlist\.js\?v=hindi-catalog-20261016-5/);
   assert.match(html, /hindi-playback-eligibility\.js\?v=verified-hindi-20261016-1/);
   assert.match(html, /share-context\.js\?v=verified-hindi-20261016-1/);
-  assert.match(html, /script\.js\?v=verified-hindi-20261016-1/);
+  assert.match(html, /script\.js\?v=playlist-lazy-render-20261019-1/);
   assert.ok(html.indexOf("playlist.js") < html.indexOf("hindi-playback-eligibility.js"));
   assert.ok(html.indexOf("hindi-playback-eligibility.js") < html.indexOf("share-context.js"));
   assert.match(source, /function filteredIndices\(\) \{\s*return eligibleTrackIndices/);
