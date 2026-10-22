@@ -3161,7 +3161,7 @@
     document.body.classList.remove("ui-idle");
     clearTimeout(state.uiTimer);
     state.uiTimer = setTimeout(() => {
-      if (!document.body.classList.contains("playlist-open") && !document.body.classList.contains("chat-open")) document.body.classList.add("ui-idle");
+      if (!document.body.classList.contains("playlist-open") && !document.body.classList.contains("chat-open") && !document.body.classList.contains("wish-open")) document.body.classList.add("ui-idle");
     }, 5200);
   }
 
@@ -3172,6 +3172,7 @@
 
   function openPlaylist() {
     if (document.body.classList.contains("chat-open")) window.CBGChat?.close();
+    if (document.body.classList.contains("wish-open")) window.CBGWish?.close();
     if (!environmentSwitchInteracted && (environmentAttentionTimer || els.environmentSwitch.classList.contains("attention"))) {
       stopEnvironmentAttention();
       environmentAttentionDue = true;

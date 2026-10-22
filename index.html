@@ -227,6 +227,9 @@
             <span>Share this moment</span>
           </button>
           <div>
+            <button class="icon-button small" id="wishButton" type="button" aria-label="A Little Wish ✨" title="A Little Wish ✨" aria-controls="wishModal" aria-expanded="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+            </button>
             <button class="icon-button small" id="lightningButton" aria-label="Call lightning" title="Call lightning">
               <svg class="lightning-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-8 12h7l-1 8 8-12h-7l1-8Z"/></svg>
               <svg class="snow-gust-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h10c2.7 0 2.7-4 0-4-1.2 0-2 .7-2.2 1.5M3 12h15c3.5 0 3.5 5 0 5-1.4 0-2.4-.8-2.7-1.9M3 16h7"/></svg>
@@ -336,6 +339,79 @@
         </div>
       </aside>
 
+      <div class="wish-overlay" id="wishOverlay" aria-hidden="true" inert>
+        <div class="wish-dialog-wrap">
+          <aside class="wish-modal" id="wishModal" role="dialog" aria-modal="true" aria-labelledby="wishTitle" aria-describedby="wishIntro">
+            <header class="wish-head">
+              <div class="wish-head-copy">
+                <p class="wish-eyebrow">CHAI BAARISH GAANE</p>
+                <h2 id="wishTitle" class="wish-title">A Little Wish ✨</h2>
+                <p id="wishIntro" class="wish-intro">“This little corner is ours. What would make it even more special?”</p>
+              </div>
+              <button class="wish-close" id="wishClose" type="button" aria-label="Close A Little Wish">×</button>
+            </header>
+
+            <form class="wish-form" id="wishForm" novalidate>
+              <!-- Lightweight honeypot -->
+              <div class="wish-hp" aria-hidden="true">
+                <label for="wishHp">Do not fill this field</label>
+                <input id="wishHp" type="text" name="wish_hp" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <div class="wish-field">
+                <label for="wishIdea" class="wish-label">What's something you'd love to see here? <span class="wish-req" aria-hidden="true">*</span></label>
+                <textarea id="wishIdea" name="idea" class="wish-textarea" rows="3" minlength="10" maxlength="500" placeholder="I wish there was a playlist for quiet midnight drives..." required aria-required="true" aria-describedby="wishIdeaError wishIdeaCount"></textarea>
+                <div class="wish-field-meta">
+                  <span class="wish-field-error" id="wishIdeaError" role="alert"></span>
+                  <span class="wish-counter" id="wishIdeaCount">0 / 500</span>
+                </div>
+              </div>
+
+              <div class="wish-field">
+                <label for="wishExplanation" class="wish-label">Tell us a little more (optional)</label>
+                <textarea id="wishExplanation" name="explanation" class="wish-textarea" rows="2" maxlength="1000" placeholder="Share the thought or feeling behind your wish..." aria-describedby="wishExplanationError wishExplanationCount"></textarea>
+                <div class="wish-field-meta">
+                  <span class="wish-field-error" id="wishExplanationError" role="alert"></span>
+                  <span class="wish-counter" id="wishExplanationCount">0 / 1000</span>
+                </div>
+              </div>
+
+              <div class="wish-field">
+                <label for="wishEmail" class="wish-label">Your email (optional)</label>
+                <input id="wishEmail" name="email" type="email" class="wish-input" maxlength="254" placeholder="you@example.com" aria-describedby="wishEmailHint wishEmailError" />
+                <p class="wish-helper" id="wishEmailHint">Only share it if you'd like to hear from us.</p>
+                <span class="wish-field-error" id="wishEmailError" role="alert"></span>
+              </div>
+
+              <div class="wish-consent-block">
+                <label class="wish-checkbox-label" for="wishConsent">
+                  <input type="checkbox" id="wishConsent" name="consent" class="wish-checkbox" />
+                  <span>Let me know by email if this feature becomes available.</span>
+                </label>
+                <p class="wish-privacy-note">Your email will only be used for this update if you choose to opt in.</p>
+              </div>
+
+              <div class="wish-status-banner" id="wishStatusBanner" role="alert" hidden></div>
+
+              <div class="wish-actions">
+                <button type="submit" id="wishSubmit" class="wish-submit">Send my wish ☕</button>
+              </div>
+
+              <footer class="wish-footer">
+                <p>We can't promise every wish will come true, but we'd love to hear yours.</p>
+              </footer>
+            </form>
+
+            <div class="wish-success-card" id="wishSuccessView" hidden>
+              <div class="wish-success-cup" aria-hidden="true">☕</div>
+              <h3 class="wish-success-title">Shukriya</h3>
+              <p class="wish-success-message">Your wish has found its way to us. Thank you for making this little corner yours. ☕</p>
+              <button type="button" class="wish-dismiss-button" id="wishDismiss">Theek hai</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
       <section class="entry entry-v2" id="entry" aria-labelledby="entryTitle">
@@ -376,6 +452,10 @@
             <span class="enter-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></svg></span>
           </button>
           <p class="sound-note"><span></span> sound enters softly</p>
+          <button class="entry-wish-trigger" id="entryWishButton" type="button" aria-label="A Little Wish ✨" title="A Little Wish ✨" aria-controls="wishModal" aria-expanded="false">
+            <span class="entry-wish-sparkle" aria-hidden="true">✨</span>
+            <span>A Little Wish</span>
+          </button>
         </div>
 
         <button class="entry-chair" id="entryChair" aria-label="Take the chair" aria-describedby="entryChairNote">
@@ -405,5 +485,6 @@
     <script src="share-context.js?v=verified-hindi-20261016-1"></script>
     <script src="script.js?v=playlist-lazy-render-20261019-1" defer></script>
     <script src="chat.js?v=chat-connect-20261019-1" defer></script>
+    <script src="wish.js?v=wish-initial-20261022-1" defer></script>
   </body>
 </html>
