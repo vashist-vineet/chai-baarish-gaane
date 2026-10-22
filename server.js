@@ -1,9 +1,16 @@
+import fs from "node:fs";
+import dotenv from "dotenv";
 import { randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import http from "node:http";
 import express from "express";
 import { Server } from "socket.io";
+import { validateWishPayload, sendWishEmail, createWishRateLimiter } from "./wish-service.js";
+
+if (process.env.NODE_ENV !== "production" && fs.existsSync(".env")) {
+  dotenv.config();
+}
 
 export const MAX_MESSAGES = 150;
 export const MAX_MESSAGE_LENGTH = 400;
@@ -62,9 +69,11 @@ function createRateGate() {
   };
 }
 
-export function createChatApplication() {
+export function createChatApplication(options = {}) {
   const app = express();
   app.disable("x-powered-by");
+  app.set("trust proxy", 1);
+  app.use(express.json({ limit: "16kb" }));
   const server = http.createServer(app);
   const normalizeOrigin = (value) => String(value || "").trim().replace(/\/$/u, "");
   const allowedOrigins = new Set([
@@ -187,6 +196,82 @@ export function createChatApplication() {
   const health = (_request, response) => response.json({ ok: true, service: "chai-pe-chat" });
   app.get("/health", health);
   app.get("/chat/health", health);
+
+  // A Little Wish — Rate limiter and CORS handling
+  const allowWish = options.wishRateLimiter || createWishRateLimiter();
+
+  const handleWishCors = (request, response) => {
+    const origin = request.headers.origin;
+    if (origin && isAllowedOrigin(origin)) {
+      response.setHeader("Access-Control-Allow-Origin", origin);
+      response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+      response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+      response.setHeader("Vary", "Origin");
+    }
+  };
+
+  app.options("/api/wish", (request, response) => {
+    const origin = request.headers.origin;
+    if (origin && !isAllowedOrigin(origin)) {
+      return response.status(403).end();
+    }
+    handleWishCors(request, response);
+    return response.status(204).end();
+  });
+
+  app.post("/api/wish", async (request, response) => {
+    const origin = request.headers.origin;
+    if (origin && !isAllowedOrigin(origin)) {
+      return response.status(403).json({ ok: false, error: "Origin not allowed." });
+    }
+    handleWishCors(request, response);
+
+    const clientIp = request.ip || request.socket.remoteAddress || "unknown";
+    if (!allowWish(clientIp)) {
+      return response.status(429).json({
+        ok: false,
+        error: "Thoda aaram se — please try again in a little while."
+      });
+    }
+
+    const validation = validateWishPayload(request.body);
+    if (!validation.ok) {
+      if (validation.honeypot) {
+        return response.status(400).json({ ok: false, error: "Invalid submission." });
+      }
+      return response.status(400).json({
+        ok: false,
+        field: validation.field,
+        error: validation.error
+      });
+    }
+
+    try {
+      await sendWishEmail(validation.data, { transportOverride: options.wishTransportOverride });
+      return response.status(200).json({
+        ok: true,
+        message: "Your wish has found its way to us. Thank you for making this little corner yours. ☕"
+      });
+    } catch (error) {
+      console.error("[wish-endpoint] Failed to deliver wish via SMTP:", error?.code || "UNKNOWN");
+      return response.status(500).json({
+        ok: false,
+        error: "We couldn't send your wish just now. Please try again in a little while."
+      });
+    }
+  });
+
+  // Body parser error handling (e.g. malformed JSON or payload too large)
+  app.use((err, _request, response, next) => {
+    if (err) {
+      if (err.type === "entity.too.large") {
+        return response.status(413).json({ ok: false, error: "Request payload too large." });
+      }
+      return response.status(400).json({ ok: false, error: "Invalid request payload." });
+    }
+    next();
+  });
+
   const root = path.dirname(fileURLToPath(import.meta.url));
   if (process.env.NODE_ENV !== "production") {
     app.use(express.static(root, { extensions: ["html"] }));

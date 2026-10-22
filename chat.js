@@ -263,6 +263,7 @@
 
   function openChat() {
     if (document.body.classList.contains("playlist-open")) els.playlistClose?.click();
+    if (document.body.classList.contains("wish-open")) window.CBGWish?.close();
     state.open = true;
     document.body.classList.add("chat-open");
     setOpenState(true);
