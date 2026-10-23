@@ -563,17 +563,18 @@ test("index.html contains both entry points, wishModal, and exact required copy"
   // Exact required copy
   assert.match(html, /A Little Wish ✨/, "Title copy matches");
   assert.match(html, /“This little corner is ours\. What would make it even more special\?”/, "Intro copy matches");
-  assert.match(html, /What's something you'd love to see here\?/, "Field 1 label matches");
-  assert.match(html, /I wish there was a playlist for quiet midnight drives\.\.\./, "Field 1 placeholder matches");
-  assert.match(html, /Tell us a little more \(optional\)/, "Field 2 label matches");
-  assert.match(html, /Share the thought or feeling behind your wish\.\.\./, "Field 2 placeholder matches");
-  assert.match(html, /Your email \(optional\)/, "Field 3 label matches");
-  assert.match(html, /you@example\.com/, "Field 3 placeholder matches");
-  assert.match(html, /Only share it if you'd like to hear from us\./, "Helper copy matches");
-  assert.match(html, /Let me know by email if this feature becomes available\./, "Consent copy matches");
+  assert.match(html, /💭 What's something you wish we had here\?/, "Field 1 label matches");
+  assert.match(html, /placeholder="Share your wish\.\.\."/, "Field 1 placeholder matches");
+  assert.match(html, /☕ Want to tell us a little more\?/, "Field 2 label matches");
+  assert.match(html, /placeholder="Explain your wish\.\.\."/, "Field 2 placeholder matches");
+  assert.match(html, /💌 Where can we reach you\? \(optional\)/, "Field 3 label matches");
+  assert.match(html, /placeholder="Your email"/, "Field 3 placeholder matches");
+  assert.doesNotMatch(html, /Only if you'd like to leave it with us\./, "Redundant email helper removed");
+  assert.match(html, /Give me a little heads-up if this wish comes true\./, "Consent label copy matches");
+  assert.match(html, /We'll email you if it becomes available\./, "Consent supporting text matches");
+  assert.doesNotMatch(html, /Your email stays private\. We'll only send this update if you ask us to\./, "Redundant privacy helper removed");
   assert.match(html, /Send my wish ☕/, "Submit button copy matches");
-  assert.match(html, /We can't promise every wish will come true, but we'd love to hear yours\./, "Footer copy matches");
-  assert.match(html, /Your email will only be used for this update if you choose to opt in\./, "Privacy note copy matches");
+  assert.match(html, /No big promises, just a little hope and a lot of chai\./, "Footer copy matches");
   assert.match(html, /Your wish has found its way to us\. Thank you for making this little corner yours\. ☕/, "Success copy matches");
 
   // Script loaded
@@ -621,6 +622,41 @@ test("style.css defines Mausam-Adaptive Glassmorphism across all six environment
 
   // Mobile responsiveness
   assert.match(css, /@media \(max-width:\s*600px\)[\s\S]*?\.wish-modal/, "Provides responsive mobile layout");
+
+  // Button visibility: hidden on initial landing screen, visible after entering
+  assert.match(css, /\.entry-wish-trigger\s*\{[^}]*display:\s*none/, "Hides entry wish trigger on initial landing screen");
+  assert.match(css, /\.entered\s+\.entry-wish-trigger\s*\{[^}]*display:\s*inline-flex/, "Reveals entry wish trigger when entered");
+
+  // Custom slim mausam-adaptive glassmorphic scrollbar scoped to wish modal
+  assert.match(css, /\.wish-modal\s*\{[^}]*scrollbar-width:\s*thin/, "Wish modal has thin scrollbar");
+  assert.match(css, /\.wish-modal\s*\{[^}]*scrollbar-color:\s*var\(--wish-scrollbar-thumb\)\s+var\(--wish-scrollbar-track\)/, "Wish modal uses adaptive scrollbar-color");
+  assert.match(css, /\.wish-modal::-webkit-scrollbar\s*\{[^}]*width:\s*6px/, "Wish modal has 6px webkit scrollbar width");
+  assert.match(css, /\.wish-modal::-webkit-scrollbar-thumb\s*\{[^}]*background-color:\s*var\(--wish-scrollbar-thumb\)/, "Wish modal scrollbar thumb adapts to mausam");
+
+  // All 6 environments define scrollbar thumb tokens
+  assert.match(css, /--wish-scrollbar-thumb:\s*rgba\(126,\s*200,\s*227/, "Baarish scrollbar thumb is defined");
+  assert.match(css, /body\[data-environment="winter"\]\s+\.wish-modal\s*\{[^}]*--wish-scrollbar-thumb:\s*rgba\(210,\s*231,\s*248/, "Winter scrollbar thumb is defined");
+  assert.match(css, /body\[data-environment="spring"\]\s+\.wish-modal\s*\{[^}]*--wish-scrollbar-thumb:\s*rgba\(158,\s*226,\s*178/, "Spring scrollbar thumb is defined");
+  assert.match(css, /body\[data-environment="autumn"\]\s+\.wish-modal\s*\{[^}]*--wish-scrollbar-thumb:\s*rgba\(242,\s*188,\s*122/, "Autumn scrollbar thumb is defined");
+  assert.match(css, /body\[data-environment="desert"\]\s+\.wish-modal\s*\{[^}]*--wish-scrollbar-thumb:\s*rgba\(245,\s*194,\s*124/, "Desert scrollbar thumb is defined");
+  assert.match(css, /body\[data-environment="coast"\]\s+\.wish-modal\s*\{[^}]*--wish-scrollbar-thumb:\s*rgba\(110,\s*228,\s*238/, "Coast scrollbar thumb is defined");
+
+  // Fixed header and proper modal flex layout
+  assert.match(css, /\.wish-modal\s*\{[^}]*display:\s*flex/, "Wish modal uses flex layout");
+  assert.match(css, /\.wish-modal\s*\{[^}]*flex-direction:\s*column/, "Wish modal lays out in column");
+  assert.match(css, /\.wish-modal\s*\{[^}]*overflow:\s*hidden/, "Wish modal clips overflow to rounded corners");
+  assert.match(css, /\.wish-head\s*\{[^}]*flex-shrink:\s*0/, "Wish header remains fixed at top without shrinking");
+  assert.match(css, /\.wish-head\s*\{[^}]*border-bottom:\s*1px\s+solid/, "Wish header has divider border");
+  assert.match(css, /\.wish-close\s*\{[^}]*flex-shrink:\s*0/, "Wish close button remains fixed at top-right");
+  assert.match(css, /\.wish-form\s*\{[^}]*overflow-y:\s*auto/, "Wish form is the scrollable container");
+  assert.match(css, /\.wish-form\s*\{[^}]*flex:\s*1/, "Wish form takes available modal height");
+
+  // Consent checkbox alignment and typography
+  assert.match(css, /\.wish-checkbox-label\s*\{[^}]*align-items:\s*center/, "Checkbox is vertically centered against text block");
+  assert.match(css, /\.wish-checkbox\s*\{[^}]*margin:\s*0/, "Checkbox resets margin for clean vertical centering");
+  assert.match(css, /\.wish-checkbox-label-text\s*\{[^}]*font-weight:\s*550/, "Main checkbox label has medium/semi-bold weight");
+  assert.match(css, /\.wish-checkbox-sub\s*\{[^}]*font-weight:\s*400/, "Supporting text has regular weight");
+  assert.match(css, /\.wish-checkbox-sub\s*\{[^}]*color:\s*var\(--wish-text-muted\)/, "Supporting text uses adaptive muted color");
 });
 
 test("environment updates preserve open wish form without resetting state or closing", () => {

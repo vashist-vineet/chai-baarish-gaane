@@ -39,7 +39,7 @@ test("Odia runtime catalog contains exactly the audited 93-track set", () => {
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 1165);
+  assert.equal(playlist.length, 1265);
   assert.equal(odia.length, 93);
   assert.equal(odiaCatalogHash(odia), EXPECTED_ODIA_CATALOG_HASH);
   assert.ok(odia.every((track) => validId(track.youtubeId)));

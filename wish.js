@@ -199,6 +199,7 @@
     if (els.triggerEntry) els.triggerEntry.setAttribute("aria-expanded", "true");
 
     updateCounts();
+    if (els.form) els.form.scrollTop = 0;
     requestAnimationFrame(() => {
       if (els.idea && !els.idea.value) {
         els.idea.focus();

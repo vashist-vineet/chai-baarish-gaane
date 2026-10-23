@@ -4105,9 +4105,9 @@ body[data-environment="coast"] .radio-console {
    A Little Wish ✨ — Mausam-Adaptive Glassmorphism
    ========================================================================== */
 
-/* Entry button in Veranda */
+/* Entry button (hidden on initial landing screen, visible only when entered) */
 .entry-wish-trigger {
-  display: inline-flex;
+  display: none;
   align-items: center;
   gap: 7px;
   margin-top: 16px;
@@ -4146,6 +4146,10 @@ body[data-environment="coast"] .radio-console {
 
 .entry-wish-sparkle {
   font-size: 12px;
+}
+
+.entered .entry-wish-trigger {
+  display: inline-flex;
 }
 
 /* Icon button in console utility row */
@@ -4209,14 +4213,19 @@ body[data-environment="coast"] .radio-console {
   --wish-btn-hover: linear-gradient(135deg, rgba(46, 88, 112, 0.9), rgba(22, 50, 68, 0.95));
   --wish-btn-text: #ffffff;
   --wish-checkbox-accent: #7ec8e3;
+  --wish-scrollbar-track: rgba(255, 255, 255, 0.04);
+  --wish-scrollbar-thumb: rgba(126, 200, 227, 0.38);
+  --wish-scrollbar-thumb-hover: rgba(126, 200, 227, 0.65);
 
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: min(470px, 100%);
   max-height: min(92vh, 640px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding: 24px 24px 20px;
+  overflow: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wish-scrollbar-thumb) var(--wish-scrollbar-track);
+  padding: 0;
   border: 1px solid var(--wish-glass-border);
   border-radius: 24px;
   background-color: var(--wish-glass-deep);
@@ -4241,6 +4250,50 @@ body[data-environment="coast"] .radio-console {
   transform: scale(1) translateY(0);
 }
 
+/* Custom slim glassmorphism scrollbar scoped to wish modal and form */
+.wish-modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wish-form::-webkit-scrollbar,
+.wish-success-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wish-modal::-webkit-scrollbar-track {
+  background: var(--wish-scrollbar-track);
+  border-radius: 999px;
+  margin: 6px 0 12px;
+}
+
+.wish-form::-webkit-scrollbar-track,
+.wish-success-card::-webkit-scrollbar-track {
+  background: var(--wish-scrollbar-track);
+  border-radius: 999px;
+  margin: 6px 0 12px;
+}
+
+.wish-modal::-webkit-scrollbar-thumb {
+  background-color: var(--wish-scrollbar-thumb);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background-color 0.2s ease;
+}
+
+.wish-form::-webkit-scrollbar-thumb,
+.wish-success-card::-webkit-scrollbar-thumb {
+  background-color: var(--wish-scrollbar-thumb);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background-color 0.2s ease;
+}
+
+.wish-modal::-webkit-scrollbar-thumb:hover,
+.wish-form::-webkit-scrollbar-thumb:hover,
+.wish-success-card::-webkit-scrollbar-thumb:hover {
+  background-color: var(--wish-scrollbar-thumb-hover);
+}
+
 /* Mausam 2: Sardi (Winter) — Frosted, cooler pale-blue/icy glass with restrained silver highlights */
 body[data-environment="winter"] .wish-modal {
   --wish-glass-bg: rgba(20, 29, 39, 0.82);
@@ -4260,6 +4313,8 @@ body[data-environment="winter"] .wish-modal {
   --wish-btn-hover: linear-gradient(135deg, rgba(58, 82, 108, 0.9), rgba(26, 46, 66, 0.95));
   --wish-btn-text: #ffffff;
   --wish-checkbox-accent: #d2e7f8;
+  --wish-scrollbar-thumb: rgba(210, 231, 248, 0.4);
+  --wish-scrollbar-thumb-hover: rgba(210, 231, 248, 0.68);
 }
 
 /* Mausam 3: Bahar (Spring) — Soft spring-green glass with subtle fresh, botanical warmth */
@@ -4281,6 +4336,8 @@ body[data-environment="spring"] .wish-modal {
   --wish-btn-hover: linear-gradient(135deg, rgba(46, 90, 66, 0.9), rgba(22, 54, 38, 0.95));
   --wish-btn-text: #ffffff;
   --wish-checkbox-accent: #9ee2b2;
+  --wish-scrollbar-thumb: rgba(158, 226, 178, 0.38);
+  --wish-scrollbar-thumb-hover: rgba(158, 226, 178, 0.65);
 }
 
 /* Mausam 4: Patjhad (Autumn) — Muted amber, rust, and warm brown glass with autumnal highlights */
@@ -4302,6 +4359,8 @@ body[data-environment="autumn"] .wish-modal {
   --wish-btn-hover: linear-gradient(135deg, rgba(94, 62, 38, 0.92), rgba(54, 32, 18, 0.96));
   --wish-btn-text: #ffffff;
   --wish-checkbox-accent: #f2bc7a;
+  --wish-scrollbar-thumb: rgba(242, 188, 122, 0.4);
+  --wish-scrollbar-thumb-hover: rgba(242, 188, 122, 0.68);
 }
 
 /* Mausam 5: Registan (Desert) — Warm sand, muted terracotta, and sunlit golden glass */
@@ -4323,6 +4382,8 @@ body[data-environment="desert"] .wish-modal {
   --wish-btn-hover: linear-gradient(135deg, rgba(104, 64, 40, 0.94), rgba(60, 32, 18, 0.97));
   --wish-btn-text: #ffffff;
   --wish-checkbox-accent: #f5c27c;
+  --wish-scrollbar-thumb: rgba(245, 194, 124, 0.4);
+  --wish-scrollbar-thumb-hover: rgba(245, 194, 124, 0.68);
 }
 
 /* Mausam 6: Samundar (Coast) — Deep ocean-blue/teal glass with subtle watery reflections */
@@ -4344,6 +4405,8 @@ body[data-environment="coast"] .wish-modal {
   --wish-btn-hover: linear-gradient(135deg, rgba(32, 90, 108, 0.92), rgba(16, 54, 68, 0.96));
   --wish-btn-text: #ffffff;
   --wish-checkbox-accent: #6ee4ee;
+  --wish-scrollbar-thumb: rgba(110, 228, 238, 0.38);
+  --wish-scrollbar-thumb-hover: rgba(110, 228, 238, 0.65);
 }
 
 /* Fallback for browsers without backdrop-filter */
@@ -4357,18 +4420,26 @@ body[data-environment="coast"] .wish-modal {
   .entry-wish-trigger { background-color: rgba(30, 30, 30, 0.9); }
 }
 
-/* Modal Header */
+/* Modal Header (Fixed at top of modal) */
 .wish-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--wish-glass-border);
+  background: linear-gradient(180deg, var(--wish-glass-bg), var(--wish-glass-deep));
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .wish-head-copy {
   flex: 1;
+  min-width: 0;
 }
 
 .wish-eyebrow {
@@ -4399,29 +4470,54 @@ body[data-environment="coast"] .wish-modal {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: 32px;
   height: 32px;
+  margin-top: 2px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s ease;
 }
 
 .wish-close:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.16);
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.32);
+  transform: scale(1.05);
+}
+
+.wish-close:active {
+  transform: scale(0.96);
 }
 
 .wish-close:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--wish-accent-glow);
   color: #ffffff;
+}
+
+/* Scrollable Form Content Area */
+.wish-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wish-scrollbar-thumb) var(--wish-scrollbar-track);
+  padding: 16px 24px 22px;
+}
+
+.wish-form[hidden] {
+  display: none !important;
 }
 
 /* Form Fields */
@@ -4467,6 +4563,25 @@ body[data-environment="coast"] .wish-modal {
 .wish-textarea {
   resize: vertical;
   min-height: 64px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wish-scrollbar-thumb) transparent;
+}
+
+.wish-textarea::-webkit-scrollbar {
+  width: 5px;
+}
+
+.wish-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wish-textarea::-webkit-scrollbar-thumb {
+  background-color: var(--wish-scrollbar-thumb);
+  border-radius: 999px;
+}
+
+.wish-textarea::-webkit-scrollbar-thumb:hover {
+  background-color: var(--wish-scrollbar-thumb-hover);
 }
 
 .wish-textarea::placeholder,
@@ -4537,21 +4652,43 @@ body[data-environment="coast"] .wish-modal {
 
 .wish-checkbox-label {
   display: flex;
-  align-items: flex-start;
-  gap: 9px;
+  align-items: center;
+  gap: 10px;
   color: var(--wish-text-main);
   font-size: 12px;
   line-height: 1.4;
   cursor: pointer;
+  user-select: none;
 }
 
 .wish-checkbox {
   flex-shrink: 0;
   width: 15px;
   height: 15px;
-  margin-top: 2px;
+  margin: 0;
   cursor: pointer;
   accent-color: var(--wish-checkbox-accent);
+}
+
+.wish-checkbox-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wish-checkbox-label-text {
+  color: var(--wish-text-main);
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+}
+
+.wish-checkbox-sub {
+  color: var(--wish-text-muted);
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 400;
 }
 
 .wish-privacy-note {
@@ -4637,8 +4774,23 @@ body[data-environment="coast"] .wish-modal {
 
 /* Success Card */
 .wish-success-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wish-scrollbar-thumb) var(--wish-scrollbar-track);
   text-align: center;
-  padding: 30px 16px 16px;
+  padding: 30px 24px 22px;
+}
+
+.wish-success-card[hidden] {
+  display: none !important;
 }
 
 .wish-success-cup {
@@ -4699,9 +4851,19 @@ body[data-environment="coast"] .wish-modal {
   }
 
   .wish-modal {
-    padding: 18px 16px 16px;
-    border-radius: 18px;
-    max-height: calc(100vh - 20px);
+    padding: 0;
+    border-radius: 20px;
+    max-height: min(92vh, calc(100dvh - 24px));
+  }
+
+  .wish-head {
+    padding: 16px 16px 12px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+  }
+
+  .wish-form {
+    padding: 12px 16px 18px;
   }
 
   .wish-title {
@@ -4721,6 +4883,10 @@ body[data-environment="coast"] .wish-modal {
   .wish-submit {
     min-height: 46px;
     font-size: 13.5px;
+  }
+
+  .wish-success-card {
+    padding: 24px 16px 18px;
   }
 }
 

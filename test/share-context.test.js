@@ -4,7 +4,7 @@ import test from "node:test";
 import vm from "node:vm";
 
 const ENVIRONMENTS = ["monsoon", "winter", "spring", "autumn", "desert", "coast"];
-const LANGUAGES = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani"];
+const LANGUAGES = ["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani", "english"];
 const MOODS = ["all", "baarish", "romantic", "nostalgic", "sad", "safar", "shaam", "sukoon", "old-gold"];
 const TRACKS = [
   { title: "Rain", language: "hindi", moods: ["baarish", "romantic"], youtubeId: "AAAAAAAAAAA" },
