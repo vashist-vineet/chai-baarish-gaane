@@ -359,8 +359,8 @@
               </div>
 
               <div class="wish-field">
-                <label for="wishIdea" class="wish-label">What's something you'd love to see here? <span class="wish-req" aria-hidden="true">*</span></label>
-                <textarea id="wishIdea" name="idea" class="wish-textarea" rows="3" minlength="10" maxlength="500" placeholder="I wish there was a playlist for quiet midnight drives..." required aria-required="true" aria-describedby="wishIdeaError wishIdeaCount"></textarea>
+                <label for="wishIdea" class="wish-label">💭 What's something you wish we had here? <span class="wish-req" aria-hidden="true">*</span></label>
+                <textarea id="wishIdea" name="idea" class="wish-textarea" rows="3" minlength="10" maxlength="500" placeholder="Share your wish..." required aria-required="true" aria-describedby="wishIdeaError wishIdeaCount"></textarea>
                 <div class="wish-field-meta">
                   <span class="wish-field-error" id="wishIdeaError" role="alert"></span>
                   <span class="wish-counter" id="wishIdeaCount">0 / 500</span>
@@ -368,8 +368,8 @@
               </div>
 
               <div class="wish-field">
-                <label for="wishExplanation" class="wish-label">Tell us a little more (optional)</label>
-                <textarea id="wishExplanation" name="explanation" class="wish-textarea" rows="2" maxlength="1000" placeholder="Share the thought or feeling behind your wish..." aria-describedby="wishExplanationError wishExplanationCount"></textarea>
+                <label for="wishExplanation" class="wish-label">☕ Want to tell us a little more?</label>
+                <textarea id="wishExplanation" name="explanation" class="wish-textarea" rows="2" maxlength="1000" placeholder="Explain your wish..." aria-describedby="wishExplanationError wishExplanationCount"></textarea>
                 <div class="wish-field-meta">
                   <span class="wish-field-error" id="wishExplanationError" role="alert"></span>
                   <span class="wish-counter" id="wishExplanationCount">0 / 1000</span>
@@ -377,18 +377,19 @@
               </div>
 
               <div class="wish-field">
-                <label for="wishEmail" class="wish-label">Your email (optional)</label>
-                <input id="wishEmail" name="email" type="email" class="wish-input" maxlength="254" placeholder="you@example.com" aria-describedby="wishEmailHint wishEmailError" />
-                <p class="wish-helper" id="wishEmailHint">Only share it if you'd like to hear from us.</p>
+                <label for="wishEmail" class="wish-label">💌 Where can we reach you? (optional)</label>
+                <input id="wishEmail" name="email" type="email" class="wish-input" maxlength="254" placeholder="Your email" aria-describedby="wishEmailError" />
                 <span class="wish-field-error" id="wishEmailError" role="alert"></span>
               </div>
 
               <div class="wish-consent-block">
                 <label class="wish-checkbox-label" for="wishConsent">
-                  <input type="checkbox" id="wishConsent" name="consent" class="wish-checkbox" />
-                  <span>Let me know by email if this feature becomes available.</span>
+                  <input type="checkbox" id="wishConsent" name="consent" class="wish-checkbox" aria-describedby="wishConsentSub" />
+                  <span class="wish-checkbox-copy">
+                    <span class="wish-checkbox-label-text">Give me a little heads-up if this wish comes true.</span>
+                    <span class="wish-checkbox-sub" id="wishConsentSub">We'll email you if it becomes available.</span>
+                  </span>
                 </label>
-                <p class="wish-privacy-note">Your email will only be used for this update if you choose to opt in.</p>
               </div>
 
               <div class="wish-status-banner" id="wishStatusBanner" role="alert" hidden></div>
@@ -398,7 +399,7 @@
               </div>
 
               <footer class="wish-footer">
-                <p>We can't promise every wish will come true, but we'd love to hear yours.</p>
+                <p>No big promises, just a little hope and a lot of chai.</p>
               </footer>
             </form>
 
