@@ -52,7 +52,7 @@ test("Assamese runtime catalog contains exactly the audited 78-track set", () =>
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 1165);
+  assert.equal(playlist.length, 1265);
   assert.equal(assamese.length, 78);
   assert.equal(assameseCatalogHash(assamese), EXPECTED_ASSAMESE_CORE_HASH);
   assert.equal(catalogHash(assamese), EXPECTED_ASSAMESE_FULL_HASH);

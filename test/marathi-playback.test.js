@@ -39,7 +39,7 @@ test("Marathi runtime catalog contains exactly the audited 80-track set", () => 
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 1165);
+  assert.equal(playlist.length, 1265);
   assert.equal(marathi.length, 80);
   assert.equal(marathiCatalogHash(marathi), EXPECTED_MARATHI_CATALOG_HASH);
   assert.ok(marathi.every((track) => validId(track.youtubeId)));

@@ -41,7 +41,7 @@ test("Gujarati runtime catalog contains exactly the approved ordered 71-track ma
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 1165);
+  assert.equal(playlist.length, 1265);
   assert.equal(gujarati.length, 71);
   assert.equal(gujaratiCatalogHash(gujarati), EXPECTED_GUJARATI_CORE_HASH);
   assert.equal(catalogHash(gujarati), EXPECTED_GUJARATI_FULL_HASH);
@@ -52,7 +52,7 @@ test("Gujarati runtime catalog contains exactly the approved ordered 71-track ma
   assert.ok(gujarati.every((track) => !otherIds.has(track.youtubeId)));
   assert.equal(new Set(allIds).size, allIds.length);
   assert.equal(new Set(allIdentities).size, allIdentities.length);
-  assert.equal(allIds.length, 1163);
+  assert.equal(allIds.length, 1263);
   assert.deepEqual(
     playlist.filter((track) => !validId(track.youtubeId)).map((track) => track.title),
     ["Jaage Jaage", "Woh Lamhe"]

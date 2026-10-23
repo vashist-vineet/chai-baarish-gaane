@@ -15,7 +15,7 @@ test("Kannada catalog keeps only verified, unique, playable-looking IDs", () => 
   const kannada = Array.from(playlist).filter((track) => track.language === "kannada");
   const populatedIds = kannada.map((track) => track.youtubeId);
 
-  assert.equal(playlist.length, 1165);
+  assert.equal(playlist.length, 1265);
   assert.equal(kannada.length, 80);
   assert.equal(playlist.filter((track) => track.language === "hindi").length, 202);
   assert.equal(new Set(populatedIds).size, populatedIds.length);
@@ -50,7 +50,7 @@ test("language and mood pools keep stable playable indices", () => {
     }
   }
 
-  assert.equal(tracks.filter((track) => /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length, 1163);
+  assert.equal(tracks.filter((track) => /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length, 1263);
   assert.equal(tracks.filter((track) => track.language === "hindi" && /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length, 200);
   assert.equal(tracks.filter((track) => track.language === "kannada" && /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length, 80);
 });
