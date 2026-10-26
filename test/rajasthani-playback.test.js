@@ -41,7 +41,7 @@ test("Rajasthani runtime catalog contains exactly the approved ordered 33-track 
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 1265);
+  assert.equal(playlist.length, 1365);
   assert.equal(rajasthani.length, 33);
   assert.equal(rajasthaniCatalogHash(rajasthani), EXPECTED_RAJASTHANI_CORE_HASH);
   assert.equal(catalogHash(rajasthani), EXPECTED_RAJASTHANI_FULL_HASH);
@@ -52,7 +52,7 @@ test("Rajasthani runtime catalog contains exactly the approved ordered 33-track 
   assert.ok(rajasthani.every((track) => !otherIds.has(track.youtubeId)));
   assert.equal(new Set(allIds).size, allIds.length);
   assert.equal(new Set(allIdentities).size, allIdentities.length);
-  assert.equal(allIds.length, 1263);
+  assert.equal(allIds.length, 1363);
   assert.deepEqual(
     playlist.filter((track) => !validId(track.youtubeId)).map((track) => track.title),
     ["Jaage Jaage", "Woh Lamhe"]
