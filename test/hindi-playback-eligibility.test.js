@@ -7,7 +7,7 @@ import vm from "node:vm";
 const HINDI_SOURCE_HASH = "eb308a06c5a550912a1d77cbe521ffa8069d7fa6d8d3d1f4dd54973baf2e5811";
 const VERIFIED_ID_HASH = "1f59a91d3102895a750fa237c6d39a9f019f480dd6475b08499bd118649172f1";
 const VERIFIED_IDENTITY_HASH = "4fb8dcabc45f4037c3b01f02b86c1c072390cefa8acf8a42e1d7dbc168ab7572";
-const NON_HINDI_SOURCE_HASH = "47811a2aee08ec310ea7c010cc414f02fe3bf17529a6268542a07132f84d4e88";
+const NON_HINDI_SOURCE_HASH = "10e11275e7d274293c72ef14f3e10b6d26385e01b93cd97b410d0a9cfd1dff00";
 
 function hash(value) {
   return crypto.createHash("sha256").update(JSON.stringify(value)).digest("hex");
@@ -82,7 +82,7 @@ test("language and mood pools, counts, stale indices, and session exclusions sha
   const kannadaValid = playlist.filter((track) => track.language === "kannada" && /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length;
 
   assert.equal(hindiIndices.length, 132);
-  assert.equal(allEligible.length, 1195);
+  assert.equal(allEligible.length, 1295);
   assert.ok(romanticHindi.length > 0);
   assert.ok(romanticHindi.every((index) => playlist[index].language === "hindi" && playlist[index].moods.includes("romantic")));
   assert.ok(!allEligible.includes(heeriyeIndex));

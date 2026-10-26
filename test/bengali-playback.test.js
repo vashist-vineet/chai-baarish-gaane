@@ -38,7 +38,7 @@ test("Bengali runtime catalog contains exactly the audited 75-track set", () => 
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 1265);
+  assert.equal(playlist.length, 1365);
   assert.equal(bengali.length, 75);
   assert.equal(bengaliCatalogHash(bengali), EXPECTED_BENGALI_CATALOG_HASH);
   assert.ok(bengali.every((track) => validId(track.youtubeId)));

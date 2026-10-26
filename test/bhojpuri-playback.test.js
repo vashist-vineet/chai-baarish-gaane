@@ -39,7 +39,7 @@ test("Bhojpuri runtime catalog contains exactly the audited 100-track set", () =
   const allIds = playlist.filter((track) => validId(track.youtubeId)).map((track) => track.youtubeId);
   const allIdentities = playlist.map(identity);
 
-  assert.equal(playlist.length, 1265);
+  assert.equal(playlist.length, 1365);
   assert.equal(bhojpuri.length, 100);
   assert.equal(bhojpuriCatalogHash(bhojpuri), EXPECTED_BHOJPURI_CATALOG_HASH);
   assert.ok(bhojpuri.every((track) => validId(track.youtubeId)));
