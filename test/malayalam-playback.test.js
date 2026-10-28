@@ -42,7 +42,7 @@ test("Hindi and Kannada catalogs are byte-for-byte unchanged by Malayalam integr
 
   assert.equal(hindi.length, 202);
   assert.equal(kannada.length, 80);
-  assert.equal(catalogHash(hindi), "eb308a06c5a550912a1d77cbe521ffa8069d7fa6d8d3d1f4dd54973baf2e5811");
+  assert.equal(catalogHash(hindi), "492b24292cec85f0e294d859db2b65ea2a56083622dc092cfb5cc737d1ece68a");
   assert.equal(catalogHash(kannada), "6c36fb2babaafb11a7f901ae949f683cfb21531161c1326a2ef3a58126be824a");
 });
 

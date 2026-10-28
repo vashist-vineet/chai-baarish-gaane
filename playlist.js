@@ -161,8 +161,8 @@ window.CBG_PLAYLIST = [
   cbgSong("Kahani Suno 2.0", "Kaifi Khalil", "Kahani Suno 2.0", "2022", "20s", ["romantic","sad"], "KgdBrGHviv4"),
   cbgSong("Heeriye", "Jasleen Royal, Arijit Singh", "Heeriye", "2023", "20s", ["romantic","sukoon"], "BZi9ppyH_Ks"),
   cbgSong("O Bedardeya", "Arijit Singh", "Tu Jhoothi Main Makkaar", "2023", "20s", ["sad","romantic"], "EdftT8GMU1U"),
-  cbgSong("Arz Kiya Hai", "Anuv Jain", "Arz Kiya Hai - Coke Studio Bharat", "2025", "20s", ["romantic","sukoon"], "bP8ATWCvqzw"),
-  cbgSong("Bairan", "Banjaare", "Bairan", "2026", "20s", ["sad","sukoon"], "oafxkMv4xnc"),
+  cbgSong("Arz Kiya Hai", "Anuv Jain", "Arz Kiya Hai - Coke Studio Bharat", "2024", "20s", ["romantic","sukoon"], "bP8ATWCvqzw"),
+  cbgSong("Bairan", "Banjaare", "Bairan", "2024", "20s", ["sad","sukoon"], "oafxkMv4xnc"),
 
   /* Additional Romantic / 90s–2000s */
   cbgSong("Tune Zindagi Mein", "Udit Narayan", "Humraaz", "2002", "00s", ["romantic","sad"], "pIAGX4Hva_0"),

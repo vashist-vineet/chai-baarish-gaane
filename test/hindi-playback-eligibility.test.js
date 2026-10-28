@@ -4,9 +4,9 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-const HINDI_SOURCE_HASH = "eb308a06c5a550912a1d77cbe521ffa8069d7fa6d8d3d1f4dd54973baf2e5811";
-const VERIFIED_ID_HASH = "1f59a91d3102895a750fa237c6d39a9f019f480dd6475b08499bd118649172f1";
-const VERIFIED_IDENTITY_HASH = "4fb8dcabc45f4037c3b01f02b86c1c072390cefa8acf8a42e1d7dbc168ab7572";
+const HINDI_SOURCE_HASH = "492b24292cec85f0e294d859db2b65ea2a56083622dc092cfb5cc737d1ece68a";
+const VERIFIED_ID_HASH = "b92c92e73a38d7202ca2c2ce97b9535cc598d0e158d38b47b6b814e69090fb50";
+const VERIFIED_IDENTITY_HASH = "45861124016fd49bb6f1f482c0fb97a801254242735ef3d136288c2c3d13f612";
 const NON_HINDI_SOURCE_HASH = "10e11275e7d274293c72ef14f3e10b6d26385e01b93cd97b410d0a9cfd1dff00";
 
 function hash(value) {
@@ -23,7 +23,7 @@ function loadRuntime() {
   };
 }
 
-test("verified Hindi manifest locks the exact ordered 132 song identities and audited IDs", () => {
+test("verified Hindi manifest locks the exact ordered 197 song identities and audited IDs", () => {
   const { playlist, eligibility } = loadRuntime();
   const hindi = playlist.filter((track) => track.language === "hindi");
   const ids = Array.from(eligibility.orderedHindiVideoIds);
@@ -43,8 +43,8 @@ test("verified Hindi manifest locks the exact ordered 132 song identities and au
 
   assert.equal(hindi.length, 202);
   assert.equal(hash(hindi), HINDI_SOURCE_HASH);
-  assert.equal(ids.length, 132);
-  assert.equal(new Set(ids).size, 132);
+  assert.equal(ids.length, 197);
+  assert.equal(new Set(ids).size, 197);
   assert.ok(ids.every((id) => /^[A-Za-z0-9_-]{11}$/.test(id)));
   assert.equal(hash(ids), VERIFIED_ID_HASH);
   assert.equal(hash(canonicalIdentities), VERIFIED_IDENTITY_HASH);
@@ -62,14 +62,27 @@ test("runtime eligibility excludes every non-manifest Hindi entry but leaves oth
   const excludedHindi = hindi.filter((track) => !eligibility.isTrackEligible(track));
   const validId = (track) => /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId);
 
-  assert.equal(eligibleHindi.length, 132);
-  assert.equal(excludedHindi.length, 70);
+  assert.equal(eligibleHindi.length, 197);
+  assert.equal(excludedHindi.length, 5);
   assert.equal(hash(nonHindi), NON_HINDI_SOURCE_HASH);
   assert.ok(nonHindi.every((track) => eligibility.isTrackEligible(track) === validId(track)));
+
+  // The 5 excluded tracks must remain excluded
   assert.equal(eligibility.isTrackEligible(hindi.find((track) => track.title === "Heeriye")), false);
   assert.equal(eligibility.isTrackEligible(hindi.find((track) => track.title === "Jaage Jaage")), false);
   assert.equal(eligibility.isTrackEligible(hindi.find((track) => track.title === "Woh Lamhe" && track.film === "Jal Pari")), false);
+  assert.equal(eligibility.isTrackEligible(hindi[26]), false, "H-Idx 26 Ajab Si must remain excluded as duplicate");
+  assert.equal(eligibility.isTrackEligible(hindi[199]), false, "H-Idx 199 Woh Ho Tum must remain excluded due to unconfirmed identity");
+
+  // Representative additions and previously eligible tracks
+  assert.equal(eligibility.isTrackEligible(hindi[25]), true, "H-Idx 25 Aankhon Mein Teri must be eligible");
   assert.equal(eligibility.isTrackEligible(hindi.find((track) => track.title === "Tere Naina")), true);
+  assert.equal(eligibility.isTrackEligible(hindi[112]), true, "H-Idx 112 Baarish (Half Girlfriend) must be eligible");
+  assert.equal(eligibility.isTrackEligible(hindi[113]), true, "H-Idx 113 Baarish (Yaariyan) must be eligible");
+
+  // Release year corrections verification
+  assert.equal(hindi[135].year, "2024", "Arz Kiya Hai release year must be 2024");
+  assert.equal(hindi[136].year, "2024", "Bairan release year must be 2024");
 });
 
 test("language and mood pools, counts, stale indices, and session exclusions share one eligibility policy", () => {
@@ -81,8 +94,8 @@ test("language and mood pools, counts, stale indices, and session exclusions sha
   const jaageIndex = playlist.findIndex((track) => track.language === "hindi" && track.title === "Jaage Jaage");
   const kannadaValid = playlist.filter((track) => track.language === "kannada" && /^[A-Za-z0-9_-]{11}$/.test(track.youtubeId)).length;
 
-  assert.equal(hindiIndices.length, 132);
-  assert.equal(allEligible.length, 1295);
+  assert.equal(hindiIndices.length, 197);
+  assert.equal(allEligible.length, 1360);
   assert.ok(romanticHindi.length > 0);
   assert.ok(romanticHindi.every((index) => playlist[index].language === "hindi" && playlist[index].moods.includes("romantic")));
   assert.ok(!allEligible.includes(heeriyeIndex));
@@ -99,7 +112,7 @@ test("language and mood pools, counts, stale indices, and session exclusions sha
     mood: "all",
     excludedIndices
   }));
-  assert.equal(sessionPool.length, 130);
+  assert.equal(sessionPool.length, 195);
   assert.ok(sessionPool.every((index) => !excludedIndices.has(index)));
 });
 
@@ -131,7 +144,7 @@ test("playlist rendering and every navigation path consume eligible pools", () =
   const source = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
 
   assert.match(html, /playlist\.js\?v=hindi-catalog-20261016-5/);
-  assert.match(html, /hindi-playback-eligibility\.js\?v=verified-hindi-20261016-1/);
+  assert.match(html, /hindi-playback-eligibility\.js\?v=verified-hindi-20261028-1/);
   assert.match(html, /share-context\.js\?v=verified-hindi-20261016-1/);
   assert.match(html, /script\.js\?v=playlist-lazy-render-20261019-1/);
   assert.ok(html.indexOf("playlist.js") < html.indexOf("hindi-playback-eligibility.js"));

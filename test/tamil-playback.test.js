@@ -58,7 +58,7 @@ test("Tamil runtime catalog contains exactly the browser-verified set", () => {
 test("Hindi, Kannada, Malayalam, and Telugu catalogs are byte-for-byte unchanged", () => {
   const playlist = loadPlaylist();
   const expected = {
-    hindi: [202, "eb308a06c5a550912a1d77cbe521ffa8069d7fa6d8d3d1f4dd54973baf2e5811"],
+    hindi: [202, "492b24292cec85f0e294d859db2b65ea2a56083622dc092cfb5cc737d1ece68a"],
     kannada: [80, "6c36fb2babaafb11a7f901ae949f683cfb21531161c1326a2ef3a58126be824a"],
     malayalam: [71, "f2cffa0825d2f672e818d835275aabf83bdab2c273639ae68db40b34877cd3a8"],
     telugu: [71, "29b75f488bbc25d4c8d2f15478f9577ea7ca82827e5a44b69fe1113a7c22a5b8"]
@@ -97,7 +97,7 @@ test("Tamil filter uses the existing queue, navigation, and recovery paths", () 
 
   assert.match(html, /data-language="tamil"/);
   assert.match(html, /playlist\.js\?v=hindi-catalog-20261016-5/);
-  assert.match(html, /hindi-playback-eligibility\.js\?v=verified-hindi-20261016-1/);
+  assert.match(html, /hindi-playback-eligibility\.js\?v=verified-hindi-20261028-1/);
   assert.match(html, /script\.js\?v=playlist-lazy-render-20261019-1/);
   assert.match(source, /new Set\(\["all", "hindi", "kannada", "malayalam", "telugu", "tamil", "bengali", "marathi", "punjabi", "odia", "bhojpuri", "assamese", "gujarati", "rajasthani"\]\)/);
   assert.match(source, /function filteredIndices\(\) \{\s*return eligibleTrackIndices/);
