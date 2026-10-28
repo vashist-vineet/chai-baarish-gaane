@@ -119,3 +119,54 @@ test("production initialization and drawer opening use the lazy rendering lifecy
   assert.match(source, /function openPlaylist\(\)[\s\S]*aria-hidden", "false"\);\s*renderPlaylist\(\);\s*els\.closePlaylist\.focus/);
   assert.doesNotMatch(source, /\$\$\("li", els\.playlist\)/, "active-row updates must not scan every rendered row");
 });
+
+test("filter option counts are deferred while closed and cached until filters change", () => {
+  let playlistOpen = false;
+  let countCalls = 0;
+  const countEligibleTracks = () => {
+    countCalls += 1;
+    return 10;
+  };
+  const langOption = { value: "hindi", textContent: "Hindi", dataset: {} };
+  const moodOption = { value: "romantic", textContent: "Romantic", dataset: {} };
+  const context = {
+    document: { body: { classList: { contains: (name) => name === "playlist-open" && playlistOpen } } },
+    state: {
+      selectedLanguage: "all",
+      selectedMood: "all",
+      filterCountsRenderKey: ""
+    },
+    els: {
+      languageFilters: { options: [langOption] },
+      moodFilters: { options: [moodOption] }
+    },
+    countEligibleTracks
+  };
+  const countsSource = source.slice(
+    source.indexOf("  function updateFilterOptionCounts"),
+    source.indexOf("  function updatePlaylistSummary")
+  );
+  const { updateFilterOptionCounts } = vm.runInNewContext(
+    `${countsSource}; ({ updateFilterOptionCounts })`,
+    context
+  );
+
+  updateFilterOptionCounts();
+  assert.equal(countCalls, 0, "must not calculate filter counts while drawer is closed");
+  assert.equal(langOption.textContent, "Hindi");
+
+  playlistOpen = true;
+  updateFilterOptionCounts();
+  assert.equal(countCalls, 2, "calculates language and mood counts on first open");
+  assert.equal(langOption.textContent, "Hindi (10)");
+  assert.equal(moodOption.textContent, "Romantic (10)");
+  assert.equal(context.state.filterCountsRenderKey, "all\u0000all");
+
+  updateFilterOptionCounts();
+  assert.equal(countCalls, 2, "reopening without filter changes reuses cached counts");
+
+  context.state.selectedLanguage = "hindi";
+  updateFilterOptionCounts();
+  assert.equal(countCalls, 4, "filter changes recalculate option counts");
+  assert.equal(context.state.filterCountsRenderKey, "hindi\u0000all");
+});

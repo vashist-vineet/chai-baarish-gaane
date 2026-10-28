@@ -75,7 +75,7 @@ input:focus-visible {
 }
 
 .scene-image {
-  --scene-art: url("assets/images/veranda-monsoon.jpg");
+  --scene-art: url("assets/images/veranda-monsoon.webp");
   --scene-fit: cover;
   --scene-position: 50% 50%;
   overflow: hidden;
@@ -1253,7 +1253,7 @@ body[data-environment="coast"] .playlist-drawer {
 }
 
 .entry-backdrop {
-  --scene-art: url("assets/images/veranda-monsoon.jpg");
+  --scene-art: url("assets/images/veranda-monsoon.webp");
   --scene-fit: cover;
   --scene-position: 50% 48%;
   inset: 0;
@@ -3188,6 +3188,7 @@ body[data-environment="spring"] .radio-console {
 @media (max-width: 760px) {
   .scene-image,
   .entry-backdrop {
+    --scene-art: url("assets/images/veranda-monsoon-mobile.webp");
     --scene-fit: cover;
     --scene-position: 29% 50%;
   }

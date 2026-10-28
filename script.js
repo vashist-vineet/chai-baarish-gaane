@@ -242,6 +242,7 @@
     selectedMood: initialContext.mood,
     playlistRendered: false,
     playlistRenderKey: "",
+    filterCountsRenderKey: "",
     recentHistory: [],
     environment: initialContext.environment,
     environmentTransitioning: false,
@@ -2005,6 +2006,9 @@
   }
 
   function updateFilterOptionCounts() {
+    if (!isPlaylistOpen()) return;
+    const filterKey = playlistFilterKey();
+    if (state.filterCountsRenderKey === filterKey) return;
     Array.from(els.languageFilters?.options || []).forEach((option) => {
       option.dataset.label ||= option.textContent.trim();
       const count = countEligibleTracks(option.value, state.selectedMood);
@@ -2015,6 +2019,7 @@
       const count = countEligibleTracks(state.selectedLanguage, option.value);
       option.textContent = `${option.dataset.label} (${count})`;
     });
+    state.filterCountsRenderKey = filterKey;
   }
 
   function playlistFilterKey() {
